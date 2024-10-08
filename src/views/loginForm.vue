@@ -15,52 +15,70 @@
                     required
                 />
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" :disabled="isLoading">
+                <span v-if="isLoading">
+                    <i class="fas fa-spinner fa-spin"></i> Logging in...
+                </span>
+                <span v-else>Login</span>
+            </button>
+            <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </form>
         <router-link to="/signup">Sign Up</router-link>
     </div>
 </template>
 
 <script>
+import api from '../services/axiosConfig';
+
 export default {
     name: 'LoginForm',
     data() {
         return {
             username: '',
             password: '',
+            isLoading: false,
+            errorMessage: null,
         };
     },
     methods: {
         async login() {
+            this.isLoading = true;
+            this.errorMessage = null;
+
             try {
-                const response = await fetch(
-                    'http://127.0.0.1:8000/api/token/',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username: this.username,
-                            password: this.password,
-                        }),
-                    }
-                );
+                // Ajuste aqui: Remover o prefixo "/api/" porque já está incluído no axiosConfig.js
+                const response = await api.post('/token/', {
+                    username: this.username,
+                    password: this.password,
+                });
 
-                if (!response.ok) {
-                    throw new Error('Failed to login');
-                }
+                // Armazenando os tokens no localStorage
+                localStorage.setItem('access_token', response.data.access);
+                localStorage.setItem('refresh_token', response.data.refresh);
 
-                const data = await response.json();
+                // Buscando as informações do usuário autenticado
+                const userResponse = await api.get('/users/me/', {
+                    headers: {
+                        Authorization: `Bearer ${response.data.access}`,
+                    },
+                });
 
-                // Armazena o token JWT em localStorage ou sessionStorage
-                localStorage.setItem('access_token', data.access);
-                localStorage.setItem('refresh_token', data.refresh);
+                // Armazenando o user_id no localStorage
+                const userId = userResponse.data.id; // Supondo que 'id' vem na resposta
+                localStorage.setItem('user_id', userId);
 
-                // Redireciona o usuário para o dashboard
+                // Redirecionando para o dashboard
                 this.$router.push('/dashboard');
             } catch (error) {
-                alert('Invalid credentials, please try again.');
+                if (error.response && error.response.status === 401) {
+                    this.errorMessage =
+                        'Credenciais inválidas. Por favor, verifique seu usuário e senha.';
+                } else {
+                    this.errorMessage =
+                        'Ocorreu um erro durante o login. Tente novamente mais tarde.';
+                }
+            } finally {
+                this.isLoading = false;
             }
         },
     },
@@ -81,6 +99,10 @@ input {
     margin-bottom: 10px;
 }
 button {
+    margin-top: 10px;
+}
+.error {
+    color: red;
     margin-top: 10px;
 }
 </style>
