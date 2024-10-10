@@ -3,7 +3,7 @@ import axios from 'axios';
 // Use a variável de ambiente para a URL da API, ou defina a URL do Render diretamente
 const apiUrl =
     process.env.VUE_APP_API_URL ||
-    'https://twitter-corujinha-web.onrender.com/api';
+    'https://twitter-corujinha-web.onrender.com/';
 
 const api = axios.create({
     baseURL: apiUrl, // Usar a URL pública do seu back-end no Render
