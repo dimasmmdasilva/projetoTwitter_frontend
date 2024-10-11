@@ -1,16 +1,19 @@
 <template>
     <div class="user-list">
         <h3>Suggested Users</h3>
-        <div v-for="user in users" :key="user.id" class="user-item">
-            <img :src="user.profileImage" alt="Profile" class="user-img" />
-            <div>
-                <p>{{ user.username }}</p>
-                <button
-                    @click="followUser(user.id)"
-                    :disabled="user.isFollowing"
-                >
-                    {{ user.isFollowing ? 'Following' : 'Follow' }}
-                </button>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+        <div v-else>
+            <div v-for="user in users" :key="user.id" class="user-item">
+                <img :src="user.profile_image" alt="Profile" class="user-img" />
+                <div>
+                    <p>{{ user.username }}</p>
+                    <button
+                        @click="followUser(user.id)"
+                        :disabled="user.isFollowing"
+                    >
+                        {{ user.isFollowing ? 'Following' : 'Follow' }}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -29,7 +32,7 @@ export default {
     },
     async mounted() {
         try {
-            const response = await api.get('/users/', {
+            const response = await api.get('users/', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('access_token')}`,
                 },
@@ -43,7 +46,7 @@ export default {
         async followUser(userId) {
             try {
                 await api.post(
-                    `/users/${userId}/follow_user/`,
+                    `users/${userId}/follow_user/`,
                     {},
                     {
                         headers: {
@@ -83,5 +86,10 @@ export default {
     height: 50px;
     border-radius: 50%;
     margin-right: 10px;
+}
+.error {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 </style>
