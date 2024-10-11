@@ -51,23 +51,28 @@ export default {
                     password: this.password,
                 });
 
-                // Armazenando os tokens no localStorage
-                localStorage.setItem('access_token', response.data.access);
-                localStorage.setItem('refresh_token', response.data.refresh);
+                // Verificar se o token foi recebido corretamente
+                if (response.data.access && response.data.refresh) {
+                    // Armazenando os tokens no localStorage
+                    localStorage.setItem('access_token', response.data.access);
+                    localStorage.setItem('refresh_token', response.data.refresh);
 
-                // Buscando as informações do usuário autenticado
-                const userResponse = await api.get('/users/me/', {
-                    headers: {
-                        Authorization: `Bearer ${response.data.access}`,
-                    },
-                });
+                    // Buscando as informações do usuário autenticado
+                    const userResponse = await api.get('/users/me/', {
+                        headers: {
+                            Authorization: `Bearer ${response.data.access}`,
+                        },
+                    });
 
-                // Armazenando o user_id no localStorage
-                const userId = userResponse.data.id; // Supondo que 'id' vem na resposta
-                localStorage.setItem('user_id', userId);
+                    // Armazenando o user_id no localStorage
+                    const userId = userResponse.data.id; // Supondo que 'id' vem na resposta
+                    localStorage.setItem('user_id', userId);
 
-                // Redirecionando para o dashboard
-                this.$router.push('/dashboard');
+                    // Redirecionando para o dashboard
+                    this.$router.push('/dashboard');
+                } else {
+                    throw new Error('Erro ao receber tokens de autenticação.');
+                }
             } catch (error) {
                 if (error.response && error.response.status === 401) {
                     this.errorMessage =
