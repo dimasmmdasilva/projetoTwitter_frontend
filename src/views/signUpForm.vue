@@ -60,7 +60,7 @@ export default {
             this.errorMessage = null;
 
             try {
-                const response = await api.post('/api/users/', {
+                const response = await api.post('/users/', {
                     username: this.username,
                     password: this.password,
                 });
