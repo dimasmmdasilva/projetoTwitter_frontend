@@ -29,7 +29,10 @@
             <button type="submit" :disabled="isLoading">
                 {{ isLoading ? 'Signing Up...' : 'Sign Up' }}
             </button>
+            <!-- Exibe a mensagem de erro se houver -->
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+            <!-- Exibe a mensagem de sucesso se o cadastro foi realizado -->
+            <p v-if="successMessage" class="success">{{ successMessage }}</p>
         </form>
         <router-link to="/">Login</router-link>
     </div>
@@ -47,6 +50,7 @@ export default {
             confirmPassword: '',
             isLoading: false,
             errorMessage: null,
+            successMessage: null, // Variável para armazenar a mensagem de sucesso
         };
     },
     methods: {
@@ -58,6 +62,7 @@ export default {
 
             this.isLoading = true;
             this.errorMessage = null;
+            this.successMessage = null; // Limpar a mensagem de sucesso antes do novo envio
 
             try {
                 const response = await api.post('users/', {
@@ -70,7 +75,11 @@ export default {
                 });
 
                 if (response.status === 201) {
-                    this.$router.push('/'); // Redirecionar para a página de login
+                    this.successMessage = 'Cadastro realizado com sucesso!'; // Definir a mensagem de sucesso
+                    // Redirecionar para a página de login após um curto intervalo
+                    setTimeout(() => {
+                        this.$router.push('/');
+                    }, 2000); // 2 segundos antes de redirecionar para dar tempo de ler a mensagem
                 } else {
                     this.errorMessage = 'Unexpected error during sign up.';
                 }
@@ -104,6 +113,10 @@ button {
 }
 .error {
     color: red;
+    margin-top: 10px;
+}
+.success {
+    color: green; /* Mensagem de sucesso em verde */
     margin-top: 10px;
 }
 </style>
