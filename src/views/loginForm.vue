@@ -46,9 +46,14 @@ export default {
             this.errorMessage = null;
 
             try {
-                const response = await api.post('/token/', {
+                // Enviando a requisição para o endpoint correto de autenticação
+                const response = await api.post('token/', {
                     username: this.username,
                     password: this.password,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json', // Certifique-se de que os dados são enviados como JSON
+                    }
                 });
 
                 // Verificar se o token foi recebido corretamente
@@ -56,17 +61,6 @@ export default {
                     // Armazenando os tokens no localStorage
                     localStorage.setItem('access_token', response.data.access);
                     localStorage.setItem('refresh_token', response.data.refresh);
-
-                    // Buscando as informações do usuário autenticado
-                    const userResponse = await api.get('/users/me/', {
-                        headers: {
-                            Authorization: `Bearer ${response.data.access}`,
-                        },
-                    });
-
-                    // Armazenando o user_id no localStorage
-                    const userId = userResponse.data.id; // Supondo que 'id' vem na resposta
-                    localStorage.setItem('user_id', userId);
 
                     // Redirecionando para o dashboard
                     this.$router.push('/dashboard');
