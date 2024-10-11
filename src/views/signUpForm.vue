@@ -57,6 +57,7 @@ export default {
         async signUp() {
             if (this.password !== this.confirmPassword) {
                 this.errorMessage = 'Passwords do not match';
+                this.confirmPassword = ''; // Limpa o campo de confirmação de senha
                 return;
             }
 
@@ -79,17 +80,15 @@ export default {
                     // Redirecionar para a página de login após um curto intervalo
                     setTimeout(() => {
                         this.$router.push('/');
-                    }, 2000); // 2 segundos antes de redirecionar para dar tempo de ler a mensagem
+                    }, 4000); // 4 segundos antes de redirecionar para dar tempo de ler a mensagem
                 } else {
                     this.errorMessage = 'Unexpected error during sign up.';
                 }
             } catch (error) {
                 if (error.response && error.response.status === 400) {
-                    this.errorMessage =
-                        'Failed to sign up. Try a different username.';
+                    this.errorMessage = error.response.data?.detail || 'Failed to sign up. Try a different username.';
                 } else {
-                    this.errorMessage =
-                        'An error occurred. Please try again later.';
+                    this.errorMessage = 'An error occurred. Please try again later.';
                 }
             } finally {
                 this.isLoading = false;

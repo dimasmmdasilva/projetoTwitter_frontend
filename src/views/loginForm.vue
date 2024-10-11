@@ -46,8 +46,8 @@ export default {
             this.errorMessage = null;
 
             try {
-                // Enviando a requisição para o endpoint correto de autenticação
-                const response = await api.post('token/', {
+                // Certifique-se de que a URL e o endpoint para a requisição estejam corretos
+                const response = await api.post('/token/', {
                     username: this.username,
                     password: this.password,
                 }, {
@@ -69,11 +69,11 @@ export default {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 401) {
-                    this.errorMessage =
-                        'Credenciais inválidas. Por favor, verifique seu usuário e senha.';
+                    this.errorMessage = 'Credenciais inválidas. Verifique seu usuário e senha.';
+                } else if (error.response && error.response.data.detail) {
+                    this.errorMessage = error.response.data.detail;
                 } else {
-                    this.errorMessage =
-                        'Ocorreu um erro durante o login. Tente novamente mais tarde.';
+                    this.errorMessage = 'Ocorreu um erro durante o login. Tente novamente mais tarde.';
                 }
             } finally {
                 this.isLoading = false;
