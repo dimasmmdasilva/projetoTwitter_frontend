@@ -47,7 +47,7 @@ export default {
 
             try {
                 // Enviando a requisição para o endpoint correto de autenticação
-                const response = await api.post('api/token/', {
+                const response = await api.post('token/', {
                     username: this.username,
                     password: this.password,
                 }, {
