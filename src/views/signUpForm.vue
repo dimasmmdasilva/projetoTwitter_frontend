@@ -63,10 +63,14 @@ export default {
                 const response = await api.post('users/', {
                     username: this.username,
                     password: this.password,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json', // Certifique-se de que os dados são enviados como JSON
+                    }
                 });
 
                 if (response.status === 201) {
-                    this.$router.push('/');
+                    this.$router.push('/'); // Redirecionar para a página de login
                 } else {
                     this.errorMessage = 'Unexpected error during sign up.';
                 }
