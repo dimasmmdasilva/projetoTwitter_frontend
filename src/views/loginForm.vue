@@ -46,7 +46,6 @@ export default {
             this.errorMessage = null;
 
             try {
-                // Ajuste aqui: Remover o prefixo "/api/" porque já está incluído no axiosConfig.js
                 const response = await api.post('/token/', {
                     username: this.username,
                     password: this.password,
