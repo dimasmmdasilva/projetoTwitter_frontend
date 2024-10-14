@@ -32,9 +32,6 @@ router.beforeEach((to, from, next) => {
         if (!accessToken) {
             return next({ path: '/login' });
         }
-
-        // Aqui você pode adicionar lógica adicional para verificar a validade do token,
-        // como verificar sua expiração, se desejar.
     }
 
     // Se a rota não requer autenticação ou a autenticação estiver válida, permite a navegação

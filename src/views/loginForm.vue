@@ -47,7 +47,7 @@ export default {
 
             try {
                 // Certifique-se de que a URL e o endpoint para a requisição estejam corretos
-                const response = await api.post('/api/token/', { // Corrigida a URL para '/api/token/'
+                const response = await api.post('token/', {
                     username: this.username,
                     password: this.password,
                 }, {
