@@ -46,7 +46,7 @@ export default {
                 }
 
                 // Fazendo a requisição para obter o perfil do usuário
-                const response = await api.get(`users/${userId}/`, {
+                const response = await api.get(`/api/users/${userId}/`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
                     },

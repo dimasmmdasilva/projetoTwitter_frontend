@@ -66,7 +66,7 @@ export default {
             this.successMessage = null; // Limpar a mensagem de sucesso antes do novo envio
 
             try {
-                const response = await api.post('users/', {
+                const response = await api.post('/api/users/', {
                     username: this.username,
                     password: this.password,
                 }, {
