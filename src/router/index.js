@@ -30,7 +30,7 @@ router.beforeEach((to, from, next) => {
 
         // Se o token não existir ou estiver expirado, redireciona para a página de login
         if (!accessToken) {
-            return next({ path: '/login' });
+            return next({ path: '/' });
         }
     }
 
