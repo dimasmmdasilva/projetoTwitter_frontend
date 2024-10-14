@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define a URL da API usando a variável de ambiente ou a URL pública no Render
-const apiUrl = process.env.VUE_APP_API_URL || 'https://twitter-corujinha-web.onrender.com/';
+const apiUrl = process.env.VUE_APP_API_URL || 'https://twitter-corujinha-web.onrender.com/api/';
 
 // Cria uma instância do Axios com a baseURL
 const api = axios.create({
