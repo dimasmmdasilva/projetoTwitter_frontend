@@ -47,7 +47,7 @@ export default {
 
             try {
                 // Certifique-se de que a URL e o endpoint para a requisição estejam corretos
-                const response = await api.post('/token/', {
+                const response = await api.post('/api/token/', { // Corrigida a URL para '/api/token/'
                     username: this.username,
                     password: this.password,
                 }, {
@@ -61,6 +61,11 @@ export default {
                     // Armazenando os tokens no localStorage
                     localStorage.setItem('access_token', response.data.access);
                     localStorage.setItem('refresh_token', response.data.refresh);
+
+                    // Armazena o user_id no localStorage, se estiver presente
+                    if (response.data.user_id) {
+                        localStorage.setItem('user_id', response.data.user_id);
+                    }
 
                     // Redirecionando para o dashboard
                     this.$router.push('/dashboard');

@@ -5,15 +5,14 @@ import UserDashboard from '@/views/userDashboard.vue';
 
 // Define as rotas do aplicativo
 const routes = [
-    { path: '/', redirect: '/login' },
+    { path: '/', redirect: '/login' }, // Redireciona para a página de login
     { path: '/login', name: 'Login', component: LoginForm },
     { path: '/signup', name: 'SignUp', component: SignUpForm },
     {
         path: '/dashboard',
         name: 'UserDashboard',
         component: UserDashboard,
-        // Adiciona um "meta" campo para definir que essa rota requer autenticação
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Define que essa rota requer autenticação
     },
 ];
 
@@ -29,13 +28,16 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth) {
         const accessToken = localStorage.getItem('access_token');
 
-        // Se o token não existir, redireciona para a página de login
+        // Se o token não existir ou estiver expirado, redireciona para a página de login
         if (!accessToken) {
             return next({ path: '/login' });
         }
+
+        // Aqui você pode adicionar lógica adicional para verificar a validade do token,
+        // como verificar sua expiração, se desejar.
     }
 
-    // Se a autenticação estiver ok, ou se a rota não precisar de autenticação, continua normalmente
+    // Se a rota não requer autenticação ou a autenticação estiver válida, permite a navegação
     next();
 });
 
