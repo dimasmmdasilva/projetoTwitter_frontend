@@ -55,6 +55,7 @@ export default {
     },
     methods: {
         async signUp() {
+            // Verifica se as senhas coincidem
             if (this.password !== this.confirmPassword) {
                 this.errorMessage = 'Passwords do not match';
                 this.confirmPassword = ''; // Limpa o campo de confirmação de senha
@@ -66,12 +67,14 @@ export default {
             this.successMessage = null; // Limpar a mensagem de sucesso antes do novo envio
 
             try {
-                const response = await api.post('/api/users/', {
-                    username: this.username,
-                    password: this.password,
-                }, {
+                const formData = new FormData();
+                formData.append('username', this.username);
+                formData.append('password', this.password);
+
+                // Fazendo a requisição para criar o usuário
+                const response = await api.post('/api/users/', formData, {
                     headers: {
-                        'Content-Type': 'application/json', // Certifique-se de que os dados são enviados como JSON
+                        'Content-Type': 'multipart/form-data',
                     }
                 });
 
@@ -115,7 +118,7 @@ button {
     margin-top: 10px;
 }
 .success {
-    color: green; /* Mensagem de sucesso em verde */
+    color: rgb(0, 255, 0);
     margin-top: 10px;
 }
 </style>

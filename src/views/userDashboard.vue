@@ -39,18 +39,8 @@ export default {
     methods: {
         async loadUserProfile() {
             try {
-                const userId = localStorage.getItem('user_id');
-                if (!userId) {
-                    this.errorMessage = 'ID de usuário não encontrado.';
-                    return;
-                }
-
-                // Fazendo a requisição para obter o perfil do usuário
-                const response = await api.get(`/api/users/${userId}/`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                    },
-                });
+                // Fazendo a requisição para obter o perfil do usuário autenticado
+                const response = await api.get('/api/users/me/');
                 
                 // Se a resposta for bem-sucedida, armazena os dados do perfil
                 this.userProfile = response.data;

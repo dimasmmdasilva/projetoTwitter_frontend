@@ -1,10 +1,8 @@
 <template>
     <div class="tweet-item">
         <h3>{{ tweet.author.username }}</h3>
-        <!-- Usando o nome do autor do tweet -->
         <p>{{ tweet.content }}</p>
         <small>{{ formatDate(tweet.created_at) }}</small>
-        <!-- Formatando a data de criação do tweet -->
     </div>
 </template>
 

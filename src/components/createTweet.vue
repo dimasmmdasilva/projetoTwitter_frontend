@@ -32,17 +32,9 @@ export default {
 
             try {
                 // Faz a requisição POST para a API de tweets
-                await api.post(
-                    '/tweets/',
-                    {
-                        content: this.tweetContent,
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                        },
-                    },
-                );
+                await api.post('/tweets/', {
+                    content: this.tweetContent,
+                });
 
                 // Limpa o campo após o envio
                 this.tweetContent = '';

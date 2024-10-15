@@ -25,36 +25,32 @@
 </template>
 
 <script>
-import TweetItem from './tweetItem.vue'; // Importação do componente TweetItem
-import api from '@/services/axiosConfig'; // Importação do Axios configurado
+import TweetItem from './tweetItem.vue'; 
+import api from '@/services/axiosConfig'; 
 
 export default {
     name: 'TweetFeed',
     components: {
-        TweetItem, // Registro do componente TweetItem
+        TweetItem,
     },
     data() {
         return {
-            tweets: [], // Tweets carregados da API
-            newTweetContent: '', // Conteúdo do novo tweet
-            isLoading: false, // Controle de carregamento
-            errorMessage: null, // Mensagem de erro
+            tweets: [],
+            newTweetContent: '',
+            isLoading: false,
+            errorMessage: null,
         };
     },
     async mounted() {
-        this.fetchTweets(); // Carrega os tweets ao montar o componente
+        this.fetchTweets();
     },
     methods: {
         async fetchTweets() {
             this.isLoading = true;
             this.errorMessage = null;
             try {
-                const response = await api.get('/tweets/followers/', {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                    },
-                });
-                this.tweets = response.data; // Armazena os tweets carregados
+                const response = await api.get('/tweets/followers/');
+                this.tweets = response.data;
             } catch (error) {
                 this.errorMessage = 'Failed to load tweets.';
             } finally {
@@ -62,22 +58,13 @@ export default {
             }
         },
         async createTweet() {
-            // Função para criar um novo tweet
             if (!this.newTweetContent) return;
             this.isLoading = true;
             this.errorMessage = null;
             try {
-                const response = await api.post(
-                    '/tweets/',
-                    { content: this.newTweetContent },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                        },
-                    },
-                );
-                this.tweets.unshift(response.data); // Adiciona o novo tweet ao topo do feed
-                this.newTweetContent = ''; // Limpa o campo de texto
+                const response = await api.post('/tweets/', { content: this.newTweetContent });
+                this.tweets.unshift(response.data);
+                this.newTweetContent = '';
             } catch (error) {
                 this.errorMessage = 'Failed to post tweet.';
             } finally {

@@ -46,31 +46,22 @@ export default {
             this.errorMessage = null;
 
             try {
-                // Certifique-se de que a URL e o endpoint para a requisição estejam corretos
-                const response = await api.post('/api/token/', {
-                    username: this.username,
-                    password: this.password,
-                }, {
+                const formData = new FormData();
+                formData.append('username', this.username);
+                formData.append('password', this.password);
+
+                // Fazendo a requisição de login para o endpoint padrão do Django para sessões
+                const response = await api.post('/api/login/', formData, {
                     headers: {
-                        'Content-Type': 'application/json', // Certifique-se de que os dados são enviados como JSON
+                        'Content-Type': 'multipart/form-data',
                     }
                 });
 
-                // Verificar se o token foi recebido corretamente
-                if (response.data.access && response.data.refresh) {
-                    // Armazenando os tokens no localStorage
-                    localStorage.setItem('access_token', response.data.access);
-                    localStorage.setItem('refresh_token', response.data.refresh);
-
-                    // Armazena o user_id no localStorage, se estiver presente
-                    if (response.data.user_id) {
-                        localStorage.setItem('user_id', response.data.user_id);
-                    }
-
-                    // Redirecionando para o dashboard
+                if (response.status === 200) {
+                    // Login bem-sucedido, redireciona para o dashboard
                     this.$router.push('/dashboard');
                 } else {
-                    throw new Error('Erro ao receber tokens de autenticação.');
+                    throw new Error('Erro ao autenticar o usuário.');
                 }
             } catch (error) {
                 if (error.response && error.response.status === 401) {

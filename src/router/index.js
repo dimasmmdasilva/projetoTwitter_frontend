@@ -2,40 +2,36 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '@/views/loginForm.vue';
 import SignUpForm from '@/views/signUpForm.vue';
 import UserDashboard from '@/views/userDashboard.vue';
+import api from '@/services/axiosConfig';
 
-// Define as rotas do aplicativo
 const routes = [
-    { path: '/', redirect: '/login' }, // Redireciona para a página de login
+    { path: '/', redirect: '/login' },
     { path: '/login', name: 'Login', component: LoginForm },
     { path: '/signup', name: 'SignUp', component: SignUpForm },
     {
         path: '/dashboard',
         name: 'UserDashboard',
         component: UserDashboard,
-        meta: { requiresAuth: true }, // Define que essa rota requer autenticação
+        meta: { requiresAuth: true },
     },
 ];
 
-// Cria o roteador Vue
 const router = createRouter({
     history: createWebHistory(),
     routes,
 });
 
-// Adiciona um "navigation guard" para proteger rotas que requerem autenticação
-router.beforeEach((to, from, next) => {
-    // Verifica se a rota requer autenticação
+router.beforeEach(async (to, from, next) => {
     if (to.meta.requiresAuth) {
-        const accessToken = localStorage.getItem('access_token');
-
-        // Se o token não existir ou estiver expirado, redireciona para a página de login
-        if (!accessToken) {
-            return next({ path: '/' });
+        try {
+            await api.get('/api/users/me/');
+            next();
+        } catch (error) {
+            next({ path: '/login' });
         }
+    } else {
+        next();
     }
-
-    // Se a rota não requer autenticação ou a autenticação estiver válida, permite a navegação
-    next();
 });
 
 export default router;
