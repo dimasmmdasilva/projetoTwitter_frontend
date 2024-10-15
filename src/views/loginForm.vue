@@ -50,6 +50,11 @@ export default {
                 const response = await api.post('/login/', {
                     username: this.username,
                     password: this.password,
+                }, {
+                    headers: {
+                        'X-CSRFToken': this.$cookies.get('csrftoken'), // Garante o envio do CSRF token
+                    },
+                    withCredentials: true // Garante que os cookies de sessão sejam enviados
                 });
 
                 if (response.status === 200) {
