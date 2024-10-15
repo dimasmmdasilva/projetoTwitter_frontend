@@ -46,31 +46,18 @@ export default {
             this.errorMessage = null;
 
             try {
-                const formData = new FormData();
-                formData.append('username', this.username);
-                formData.append('password', this.password);
-
-                // Fazendo a requisição de login para o endpoint padrão do Django para sessões
-                const response = await api.post('login/', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    }
+                const response = await api.post('/login/', {
+                    username: this.username,
+                    password: this.password,
                 });
 
                 if (response.status === 200) {
-                    // Login bem-sucedido, redireciona para o dashboard
                     this.$router.push('/dashboard');
                 } else {
                     throw new Error('Erro ao autenticar o usuário.');
                 }
             } catch (error) {
-                if (error.response && error.response.status === 401) {
-                    this.errorMessage = 'Credenciais inválidas. Verifique seu usuário e senha.';
-                } else if (error.response && error.response.data.detail) {
-                    this.errorMessage = error.response.data.detail;
-                } else {
-                    this.errorMessage = 'Ocorreu um erro durante o login. Tente novamente mais tarde.';
-                }
+                this.errorMessage = 'Credenciais inválidas. Verifique seu usuário e senha.';
             } finally {
                 this.isLoading = false;
             }

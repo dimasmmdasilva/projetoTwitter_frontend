@@ -1,13 +1,10 @@
 <template>
     <div class="container">
         <div class="sidebar">
-            <!-- Passando as informações de perfil para o componente de perfil -->
             <UserProfile :userProfile="userProfile" />
         </div>
         <div class="main-content">
-            <!-- Componente do feed de tweets -->
             <TweetFeed />
-            <!-- Componente da lista de usuários -->
             <UserList />
         </div>
     </div>
@@ -28,31 +25,28 @@ export default {
     },
     data() {
         return {
-            userProfile: null,  // Perfil do usuário
-            isLoading: true,    // Controla o estado de carregamento
-            errorMessage: null, // Mensagens de erro
+            userProfile: null,
+            isLoading: true,
+            errorMessage: null,
         };
     },
     async mounted() {
-        this.loadUserProfile(); // Carrega o perfil quando o componente é montado
+        this.loadUserProfile();
     },
     methods: {
         async loadUserProfile() {
             try {
-                // Fazendo a requisição para obter o perfil do usuário autenticado
                 const response = await api.get('/api/users/me/');
-                
-                // Se a resposta for bem-sucedida, armazena os dados do perfil
                 this.userProfile = response.data;
             } catch (error) {
                 if (error.response && error.response.status === 401) {
                     this.errorMessage = 'Você não está autorizado. Faça login novamente.';
-                    this.$router.push('/login'); // Redireciona para o login
+                    this.$router.push('/login');
                 } else {
                     this.errorMessage = 'Erro ao carregar perfil. Tente novamente mais tarde.';
                 }
             } finally {
-                this.isLoading = false; // Para o carregamento
+                this.isLoading = false;
             }
         },
     },
@@ -64,13 +58,11 @@ export default {
     display: flex;
     height: 100vh;
 }
-
 .sidebar {
     width: 20%;
     background-color: #f5f5f5;
     padding: 20px;
 }
-
 .main-content {
     width: 80%;
     padding: 20px;

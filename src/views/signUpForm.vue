@@ -29,9 +29,7 @@
             <button type="submit" :disabled="isLoading">
                 {{ isLoading ? 'Signing Up...' : 'Sign Up' }}
             </button>
-            <!-- Exibe a mensagem de erro se houver -->
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-            <!-- Exibe a mensagem de sucesso se o cadastro foi realizado -->
             <p v-if="successMessage" class="success">{{ successMessage }}</p>
         </form>
         <router-link to="/">Login</router-link>
@@ -50,40 +48,32 @@ export default {
             confirmPassword: '',
             isLoading: false,
             errorMessage: null,
-            successMessage: null, // Variável para armazenar a mensagem de sucesso
+            successMessage: null,
         };
     },
     methods: {
         async signUp() {
-            // Verifica se as senhas coincidem
             if (this.password !== this.confirmPassword) {
                 this.errorMessage = 'Passwords do not match';
-                this.confirmPassword = ''; // Limpa o campo de confirmação de senha
+                this.confirmPassword = '';
                 return;
             }
 
             this.isLoading = true;
             this.errorMessage = null;
-            this.successMessage = null; // Limpar a mensagem de sucesso antes do novo envio
+            this.successMessage = null;
 
             try {
-                const formData = new FormData();
-                formData.append('username', this.username);
-                formData.append('password', this.password);
-
-                // Fazendo a requisição para criar o usuário
-                const response = await api.post('/api/users/', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    }
+                const response = await api.post('/api/users/', {
+                    username: this.username,
+                    password: this.password,
                 });
 
                 if (response.status === 201) {
-                    this.successMessage = 'Cadastro realizado com sucesso!'; // Definir a mensagem de sucesso
-                    // Redirecionar para a página de login após um curto intervalo
+                    this.successMessage = 'Cadastro realizado com sucesso!';
                     setTimeout(() => {
                         this.$router.push('/');
-                    }, 4000); // 4 segundos antes de redirecionar para dar tempo de ler a mensagem
+                    }, 4000);
                 } else {
                     this.errorMessage = 'Unexpected error during sign up.';
                 }

@@ -11,19 +11,21 @@ const api = axios.create({
     withCredentials: true,
 });
 
+// Interceptor para adicionar o CSRF Token em cada requisição
 api.interceptors.request.use((config) => {
+    const token = getCookie('csrftoken');  // Função para pegar o CSRF Token do cookie
+    if (token) {
+        config.headers['X-CSRFToken'] = token;  // Adiciona o CSRF Token ao cabeçalho
+    }
     return config;
 }, (error) => {
     return Promise.reject(error);
 });
 
-api.interceptors.response.use((response) => {
-    return response;
-}, (error) => {
-    if (error.response && error.response.status === 401) {
-        window.location.href = '/login';
-    }
-    return Promise.reject(error);
-});
+// Função para obter o valor do cookie
+function getCookie(name) {
+    const cookieValue = document.cookie.split('; ').find(row => row.startsWith(name + '='));
+    return cookieValue ? cookieValue.split('=')[1] : null;
+}
 
 export default api;
