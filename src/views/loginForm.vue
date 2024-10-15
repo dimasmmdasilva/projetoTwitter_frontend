@@ -51,7 +51,7 @@ export default {
                 formData.append('password', this.password);
 
                 // Fazendo a requisição de login para o endpoint padrão do Django para sessões
-                const response = await api.post('/api/login/', formData, {
+                const response = await api.post('login/', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     }
