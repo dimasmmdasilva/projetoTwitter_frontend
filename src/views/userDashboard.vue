@@ -7,6 +7,8 @@
             <TweetFeed />
             <UserList />
         </div>
+        <div v-if="isLoading" class="loading">Carregando...</div>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
     </div>
 </template>
 
@@ -31,22 +33,29 @@ export default {
         };
     },
     async mounted() {
-        this.loadUserProfile();
+        await this.loadUserProfile();
     },
     methods: {
         async loadUserProfile() {
+            this.isLoading = true; // Inicia o carregamento
+            this.errorMessage = null; // Limpa mensagens de erro
+
             try {
                 const response = await api.get('/api/users/me/');
                 this.userProfile = response.data;
             } catch (error) {
-                if (error.response && error.response.status === 401) {
-                    this.errorMessage = 'Você não está autorizado. Faça login novamente.';
-                    this.$router.push('/login');
+                if (error.response) {
+                    if (error.response.status === 401) {
+                        this.errorMessage = 'Você não está autorizado. Faça login novamente.';
+                        this.$router.push('/login');
+                    } else {
+                        this.errorMessage = 'Erro ao carregar perfil: ' + (error.response.data.detail || 'Tente novamente mais tarde.');
+                    }
                 } else {
-                    this.errorMessage = 'Erro ao carregar perfil. Tente novamente mais tarde.';
+                    this.errorMessage = 'Erro ao carregar perfil. Verifique sua conexão com a internet.';
                 }
             } finally {
-                this.isLoading = false;
+                this.isLoading = false; // Finaliza o carregamento
             }
         },
     },
@@ -66,5 +75,13 @@ export default {
 .main-content {
     width: 80%;
     padding: 20px;
+}
+.loading {
+    text-align: center;
+    margin-top: 20px;
+}
+.error {
+    color: red;
+    margin-top: 20px;
 }
 </style>

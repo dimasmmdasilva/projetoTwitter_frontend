@@ -46,18 +46,24 @@ export default {
             this.errorMessage = null;
 
             try {
+                // Fazendo a requisição de login com as credenciais do usuário
                 const response = await api.post('/login/', {
                     username: this.username,
                     password: this.password,
                 });
 
                 if (response.status === 200) {
+                    // Login bem-sucedido, redireciona para o dashboard
                     this.$router.push('/dashboard');
                 } else {
                     throw new Error('Erro ao autenticar o usuário.');
                 }
             } catch (error) {
-                this.errorMessage = 'Credenciais inválidas. Verifique seu usuário e senha.';
+                if (error.response && error.response.status === 401) {
+                    this.errorMessage = 'Credenciais inválidas. Verifique seu usuário e senha.';
+                } else {
+                    this.errorMessage = 'Ocorreu um erro durante o login. Tente novamente mais tarde.';
+                }
             } finally {
                 this.isLoading = false;
             }

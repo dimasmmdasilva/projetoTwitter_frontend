@@ -31,29 +31,20 @@ export default {
         };
     },
     async mounted() {
-        try {
-            const response = await api.get('users/', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                },
-            });
-            this.users = response.data;
-        } catch (error) {
-            this.errorMessage = 'Failed to load users.';
-        }
+        await this.loadUsers(); // Chamando método separado para carregar usuários
     },
     methods: {
+        async loadUsers() {
+            try {
+                const response = await api.get('users/'); // Obtenha usuários sem token adicional
+                this.users = response.data;
+            } catch (error) {
+                this.errorMessage = 'Failed to load users.';
+            }
+        },
         async followUser(userId) {
             try {
-                await api.post(
-                    `users/${userId}/follow_user/`,
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-                        },
-                    },
-                );
+                await api.post(`users/${userId}/follow_user/`, {}); // CSRF token é tratado automaticamente pelo axios
                 // Atualiza a lista de usuários
                 this.users = this.users.map((user) => {
                     if (user.id === userId) {
@@ -62,7 +53,8 @@ export default {
                     return user;
                 });
             } catch (error) {
-                console.error('Failed to follow user');
+                this.errorMessage = 'Failed to follow user'; // Adiciona mensagem de erro
+                console.error('Failed to follow user', error);
             }
         },
     },

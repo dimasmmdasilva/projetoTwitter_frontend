@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Importando a biblioteca para gerenciar cookies
 
 const apiUrl = process.env.VUE_APP_API_URL || 'https://twitter-corujinha-web.onrender.com';
 
@@ -7,25 +8,22 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': Cookies.get('csrftoken'), // Obtém o CSRF token do cookie
     },
-    withCredentials: true,
+    withCredentials: true, // Permite o envio de cookies com as requisições
 });
 
-// Interceptor para adicionar o CSRF Token em cada requisição
-api.interceptors.request.use((config) => {
-    const token = getCookie('csrftoken');  // Função para pegar o CSRF Token do cookie
-    if (token) {
-        config.headers['X-CSRFToken'] = token;  // Adiciona o CSRF Token ao cabeçalho
+// Interceptor para verificar a resposta
+api.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            window.location.href = '/login'; // Redireciona para a página de login em caso de não autorizado
+        }
+        return Promise.reject(error);
     }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
-
-// Função para obter o valor do cookie
-function getCookie(name) {
-    const cookieValue = document.cookie.split('; ').find(row => row.startsWith(name + '='));
-    return cookieValue ? cookieValue.split('=')[1] : null;
-}
+);
 
 export default api;
