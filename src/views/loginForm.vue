@@ -8,12 +8,7 @@
             </div>
             <div>
                 <label for="password">Password</label>
-                <input
-                    v-model="password"
-                    type="password"
-                    id="password"
-                    required
-                />
+                <input v-model="password" type="password" id="password" required />
             </div>
             <button type="submit" :disabled="isLoading">
                 <span v-if="isLoading">
@@ -29,6 +24,7 @@
 
 <script>
 import api from '../services/axiosConfig';
+import Cookies from 'js-cookie'; // Importando biblioteca de cookies
 
 export default {
     name: 'LoginForm',
@@ -47,12 +43,13 @@ export default {
 
             try {
                 // Fazendo a requisição de login com as credenciais do usuário
+                const csrfToken = Cookies.get('csrftoken'); // Obtém o CSRF token
                 const response = await api.post('/login/', {
                     username: this.username,
                     password: this.password,
                 }, {
                     headers: {
-                        'X-CSRFToken': this.$cookies.get('csrftoken'), // Garante o envio do CSRF token
+                        'X-CSRFToken': csrfToken, // Envia o CSRF token no cabeçalho
                     },
                     withCredentials: true // Garante que os cookies de sessão sejam enviados
                 });

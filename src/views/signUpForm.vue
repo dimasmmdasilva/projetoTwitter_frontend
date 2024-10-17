@@ -54,7 +54,7 @@ export default {
     methods: {
         async signUp() {
             if (this.password !== this.confirmPassword) {
-                this.errorMessage = 'Passwords do not match';
+                this.errorMessage = 'As senhas não coincidem';
                 this.confirmPassword = '';
                 return;
             }
@@ -72,16 +72,16 @@ export default {
                 if (response.status === 201) {
                     this.successMessage = 'Cadastro realizado com sucesso!';
                     setTimeout(() => {
-                        this.$router.push('/');
+                        this.$router.push('/login');
                     }, 4000);
                 } else {
-                    this.errorMessage = 'Unexpected error during sign up.';
+                    this.errorMessage = 'Erro inesperado durante o cadastro.';
                 }
             } catch (error) {
                 if (error.response && error.response.status === 400) {
-                    this.errorMessage = error.response.data?.detail || 'Failed to sign up. Try a different username.';
+                    this.errorMessage = error.response.data?.detail || 'Falha no cadastro. Tente um nome de usuário diferente.';
                 } else {
-                    this.errorMessage = 'An error occurred. Please try again later.';
+                    this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
                 }
             } finally {
                 this.isLoading = false;
