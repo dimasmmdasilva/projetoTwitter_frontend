@@ -6,7 +6,7 @@
             maxlength="280"
             rows="3"
         ></textarea>
-        <button @click="postTweet" :disabled="isPosting || tweetContent === ''">
+        <button @click="postTweet" :disabled="isPosting || !tweetContent.trim()">
             {{ isPosting ? 'Posting...' : 'Tweet' }}
         </button>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -21,28 +21,39 @@ export default {
     data() {
         return {
             tweetContent: '',
-            isPosting: false,
-            errorMessage: null,
+            isPosting: false,  // Controle de estado de postagem
+            errorMessage: null,  // Mensagem de erro
         };
     },
     methods: {
         async postTweet() {
+            // Impede o envio se o conteúdo estiver vazio
+            if (!this.tweetContent.trim()) {
+                this.errorMessage = 'Tweet content cannot be empty.';
+                return;
+            }
+
             this.isPosting = true;
             this.errorMessage = null;
 
             try {
                 // Faz a requisição POST para a API de tweets
-                await api.post('/tweets/', {
-                    content: this.tweetContent,
+                const response = await api.post('/tweets/', {
+                    content: this.tweetContent.trim(),
                 });
 
-                // Limpa o campo após o envio
+                // Limpa o campo após o envio bem-sucedido
                 this.tweetContent = '';
 
                 // Atualiza o feed de tweets (comunicação com o componente pai)
-                this.$emit('tweet-posted');
+                this.$emit('tweet-posted', response.data);
             } catch (error) {
-                this.errorMessage = 'Failed to post the tweet.';
+                // Tratamento de erro
+                if (error.response) {
+                    this.errorMessage = error.response.data?.detail || 'Failed to post the tweet. Please try again.';
+                } else {
+                    this.errorMessage = 'Failed to post the tweet. Please check your internet connection.';
+                }
             } finally {
                 this.isPosting = false;
             }
@@ -70,6 +81,9 @@ button {
     color: white;
     border-radius: 8px;
     cursor: pointer;
+}
+button:disabled {
+    background-color: #aaa;
 }
 .error {
     color: red;

@@ -11,9 +11,7 @@
                 <input v-model="password" type="password" id="password" required />
             </div>
             <button type="submit" :disabled="isLoading">
-                <span v-if="isLoading">
-                    <i class="fas fa-spinner fa-spin"></i> Logging in...
-                </span>
+                <span v-if="isLoading">Logging in...</span>
                 <span v-else>Login</span>
             </button>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -24,7 +22,6 @@
 
 <script>
 import api from '../services/axiosConfig';
-import Cookies from 'js-cookie'; // Importando biblioteca de cookies
 
 export default {
     name: 'LoginForm',
@@ -42,20 +39,13 @@ export default {
             this.errorMessage = null;
 
             try {
-                // Fazendo a requisição de login com as credenciais do usuário
-                const csrfToken = Cookies.get('csrftoken'); // Obtém o CSRF token
-                const response = await api.post('/login/', {
+                const response = await api.post('/api/users/login/', {
                     username: this.username,
                     password: this.password,
-                }, {
-                    headers: {
-                        'X-CSRFToken': csrfToken, // Envia o CSRF token no cabeçalho
-                    },
-                    withCredentials: true // Garante que os cookies de sessão sejam enviados
                 });
 
                 if (response.status === 200) {
-                    // Login bem-sucedido, redireciona para o dashboard
+                    // Os cookies HttpOnly são automaticamente gerenciados pelo navegador
                     this.$router.push('/dashboard');
                 } else {
                     throw new Error('Erro ao autenticar o usuário.');
@@ -75,23 +65,9 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
-    text-align: center;
-    margin-top: 50px;
-}
-form {
-    display: inline-block;
-}
-label,
-input {
-    display: block;
-    margin-bottom: 10px;
-}
-button {
-    margin-top: 10px;
-}
-.error {
-    color: red;
-    margin-top: 10px;
-}
+.login-container { text-align: center; margin-top: 50px; }
+form { display: inline-block; }
+label, input { display: block; margin-bottom: 10px; }
+button { margin-top: 10px; }
+.error { color: red; margin-top: 10px; }
 </style>

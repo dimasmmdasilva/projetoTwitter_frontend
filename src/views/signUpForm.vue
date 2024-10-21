@@ -32,7 +32,7 @@
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
             <p v-if="successMessage" class="success">{{ successMessage }}</p>
         </form>
-        <router-link to="/">Login</router-link>
+        <router-link to="/login">Login</router-link>
     </div>
 </template>
 
@@ -55,6 +55,7 @@ export default {
         async signUp() {
             if (this.password !== this.confirmPassword) {
                 this.errorMessage = 'As senhas não coincidem';
+                this.successMessage = null;  
                 this.confirmPassword = '';
                 return;
             }
@@ -64,6 +65,7 @@ export default {
             this.successMessage = null;
 
             try {
+                // Faz a requisição de cadastro
                 const response = await api.post('/api/users/', {
                     username: this.username,
                     password: this.password,
@@ -71,17 +73,22 @@ export default {
 
                 if (response.status === 201) {
                     this.successMessage = 'Cadastro realizado com sucesso!';
+                    this.errorMessage = null;
+
                     setTimeout(() => {
                         this.$router.push('/login');
-                    }, 4000);
+                    }, 3000);
                 } else {
                     this.errorMessage = 'Erro inesperado durante o cadastro.';
+                    this.successMessage = null;
                 }
             } catch (error) {
                 if (error.response && error.response.status === 400) {
                     this.errorMessage = error.response.data?.detail || 'Falha no cadastro. Tente um nome de usuário diferente.';
+                    this.successMessage = null;
                 } else {
                     this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
+                    this.successMessage = null;
                 }
             } finally {
                 this.isLoading = false;

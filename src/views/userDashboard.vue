@@ -37,25 +37,22 @@ export default {
     },
     methods: {
         async loadUserProfile() {
-            this.isLoading = true; // Inicia o carregamento
-            this.errorMessage = null; // Limpa mensagens de erro
+            this.isLoading = true;
+            this.errorMessage = null;
 
             try {
-                const response = await api.get('/api/users/me/');
+                const response = await api.get('/api/users/me/');  // Requisição autenticada usando cookies
+
                 this.userProfile = response.data;
             } catch (error) {
-                if (error.response) {
-                    if (error.response.status === 401) {
-                        this.errorMessage = 'Você não está autorizado. Faça login novamente.';
-                        this.$router.push('/login');
-                    } else {
-                        this.errorMessage = 'Erro ao carregar perfil: ' + (error.response.data.detail || 'Tente novamente mais tarde.');
-                    }
+                if (error.response && error.response.status === 401) {
+                    this.errorMessage = 'Você não está autorizado. Faça login novamente.';
+                    this.$router.push('/login');
                 } else {
-                    this.errorMessage = 'Erro ao carregar perfil. Verifique sua conexão com a internet.';
+                    this.errorMessage = 'Erro ao carregar perfil. Tente novamente mais tarde.';
                 }
             } finally {
-                this.isLoading = false; // Finaliza o carregamento
+                this.isLoading = false;
             }
         },
     },
@@ -63,25 +60,9 @@ export default {
 </script>
 
 <style scoped>
-.container {
-    display: flex;
-    height: 100vh;
-}
-.sidebar {
-    width: 20%;
-    background-color: #f5f5f5;
-    padding: 20px;
-}
-.main-content {
-    width: 80%;
-    padding: 20px;
-}
-.loading {
-    text-align: center;
-    margin-top: 20px;
-}
-.error {
-    color: red;
-    margin-top: 20px;
-}
+.container { display: flex; height: 100vh; }
+.sidebar { width: 20%; background-color: #f5f5f5; padding: 20px; }
+.main-content { width: 80%; padding: 20px; }
+.loading { text-align: center; margin-top: 20px; }
+.error { color: red; margin-top: 20px; }
 </style>
