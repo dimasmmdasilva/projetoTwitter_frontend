@@ -2,7 +2,9 @@
     <div class="user-list">
         <h3>Usuários Sugeridos</h3>
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-        <div v-else-if="users.length === 0" class="no-users">Não existem usuários.</div>
+        <div v-else-if="users.length === 0" class="no-users">
+            Não existem usuários.
+        </div>
         <div v-else>
             <div v-for="user in users" :key="user.id" class="user-item">
                 <img :src="user.profile_image" alt="Profile" class="user-img" />
@@ -29,7 +31,7 @@ export default {
         return {
             users: [],
             errorMessage: null,
-            isLoading: false,  // Adiciona estado de carregamento
+            isLoading: false, // Adiciona estado de carregamento
         };
     },
     async mounted() {
@@ -47,9 +49,9 @@ export default {
             }
         },
         async followUser(userId) {
-            this.isLoading = true;  // Ativa estado de carregamento durante a ação
+            this.isLoading = true; // Ativa estado de carregamento durante a ação
             try {
-                await api.post(`users/${userId}/follow_user/`, {});  // Envia requisição de seguir usuário
+                await api.post(`users/${userId}/follow_user/`, {}); // Envia requisição de seguir usuário
                 // Atualiza o status de "isFollowing" do usuário após sucesso
                 this.users = this.users.map((user) => {
                     if (user.id === userId) {
@@ -59,9 +61,9 @@ export default {
                 });
             } catch (error) {
                 this.errorMessage = 'Falha ao seguir o usuário.';
-                console.error('Erro ao seguir usuário:', error);  // Log de erro
+                console.error('Erro ao seguir usuário:', error); // Log de erro
             } finally {
-                this.isLoading = false;  // Desativa estado de carregamento
+                this.isLoading = false; // Desativa estado de carregamento
             }
         },
     },
@@ -85,7 +87,7 @@ export default {
     height: 50px;
     border-radius: 50%;
     margin-right: 10px;
-    object-fit: cover;  /* Ajusta a imagem para cobrir o espaço sem distorção */
+    object-fit: cover; /* Ajusta a imagem para cobrir o espaço sem distorção */
 }
 .error {
     color: red;
@@ -98,7 +100,7 @@ export default {
     margin-bottom: 20px;
 }
 button:disabled {
-    background-color: grey;  /* Indica quando o botão está desabilitado */
+    background-color: grey; /* Indica quando o botão está desabilitado */
     cursor: not-allowed;
 }
 </style>

@@ -14,7 +14,7 @@ export default {
     data() {
         return {
             isLiked: this.tweet.is_liked_by_user, // Cria uma variável local para armazenar o estado de like
-            likesCount: this.tweet.likes_count // Armazena a contagem de likes localmente
+            likesCount: this.tweet.likes_count, // Armazena a contagem de likes localmente
         };
     },
     methods: {

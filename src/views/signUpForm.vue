@@ -55,7 +55,7 @@ export default {
         async signUp() {
             if (this.password !== this.confirmPassword) {
                 this.errorMessage = 'As senhas não coincidem';
-                this.successMessage = null;  
+                this.successMessage = null;
                 this.confirmPassword = '';
                 return;
             }
@@ -84,10 +84,13 @@ export default {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 400) {
-                    this.errorMessage = error.response.data?.detail || 'Falha no cadastro. Tente um nome de usuário diferente.';
+                    this.errorMessage =
+                        error.response.data?.detail ||
+                        'Falha no cadastro. Tente um nome de usuário diferente.';
                     this.successMessage = null;
                 } else {
-                    this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
+                    this.errorMessage =
+                        'Ocorreu um erro. Tente novamente mais tarde.';
                     this.successMessage = null;
                 }
             } finally {

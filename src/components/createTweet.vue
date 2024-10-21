@@ -6,7 +6,10 @@
             maxlength="280"
             rows="3"
         ></textarea>
-        <button @click="postTweet" :disabled="isPosting || !tweetContent.trim()">
+        <button
+            @click="postTweet"
+            :disabled="isPosting || !tweetContent.trim()"
+        >
             {{ isPosting ? 'Posting...' : 'Tweet' }}
         </button>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -21,8 +24,8 @@ export default {
     data() {
         return {
             tweetContent: '',
-            isPosting: false,  // Controle de estado de postagem
-            errorMessage: null,  // Mensagem de erro
+            isPosting: false, // Controle de estado de postagem
+            errorMessage: null, // Mensagem de erro
         };
     },
     methods: {
@@ -50,9 +53,12 @@ export default {
             } catch (error) {
                 // Tratamento de erro
                 if (error.response) {
-                    this.errorMessage = error.response.data?.detail || 'Failed to post the tweet. Please try again.';
+                    this.errorMessage =
+                        error.response.data?.detail ||
+                        'Failed to post the tweet. Please try again.';
                 } else {
-                    this.errorMessage = 'Failed to post the tweet. Please check your internet connection.';
+                    this.errorMessage =
+                        'Failed to post the tweet. Please check your internet connection.';
                 }
             } finally {
                 this.isPosting = false;

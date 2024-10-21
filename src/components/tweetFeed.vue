@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import TweetItem from './tweetItem.vue'; 
-import api from '@/services/axiosConfig'; 
+import TweetItem from './tweetItem.vue';
+import api from '@/services/axiosConfig';
 
 export default {
     name: 'TweetFeed',
@@ -54,9 +54,13 @@ export default {
                 this.tweets = response.data;
             } catch (error) {
                 if (error.response) {
-                    this.errorMessage = 'Erro ao carregar os tweets: ' + (error.response.data?.detail || 'Tente novamente mais tarde.');
+                    this.errorMessage =
+                        'Erro ao carregar os tweets: ' +
+                        (error.response.data?.detail ||
+                            'Tente novamente mais tarde.');
                 } else {
-                    this.errorMessage = 'Erro de conexão. Verifique sua internet.';
+                    this.errorMessage =
+                        'Erro de conexão. Verifique sua internet.';
                 }
             } finally {
                 this.isLoading = false; // Finaliza o estado de carregamento
@@ -69,14 +73,20 @@ export default {
             this.errorMessage = null; // Limpa mensagens de erro
 
             try {
-                const response = await api.post('/tweets/', { content: this.newTweetContent }); // Requisição para criar tweet
+                const response = await api.post('/tweets/', {
+                    content: this.newTweetContent,
+                }); // Requisição para criar tweet
                 this.tweets.unshift(response.data); // Adiciona o novo tweet ao início da lista
                 this.newTweetContent = ''; // Limpa o campo de criação de tweet
             } catch (error) {
                 if (error.response) {
-                    this.errorMessage = 'Erro ao postar o tweet: ' + (error.response.data?.detail || 'Tente novamente mais tarde.');
+                    this.errorMessage =
+                        'Erro ao postar o tweet: ' +
+                        (error.response.data?.detail ||
+                            'Tente novamente mais tarde.');
                 } else {
-                    this.errorMessage = 'Erro de conexão. Verifique sua internet.';
+                    this.errorMessage =
+                        'Erro de conexão. Verifique sua internet.';
                 }
             } finally {
                 this.isLoading = false; // Finaliza o estado de carregamento
