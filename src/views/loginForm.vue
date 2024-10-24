@@ -1,46 +1,70 @@
 <template>
     <div class="login-container">
-        <h2>Login</h2>
-        <form @submit.prevent="login">
-            <input
-                v-model="username"
-                type="text"
-                placeholder="Username"
-                required
-            />
-            <input
-                v-model="password"
-                type="password"
-                placeholder="Password"
-                required
-            />
-            <button type="submit">Login</button>
-            <p v-if="errorMessage">{{ errorMessage }}</p>
+        <h1>Login</h1>
+        <form @submit.prevent="handleLogin">
+            <div>
+                <input
+                    type="text"
+                    v-model="username"
+                    placeholder="Nome de usuário"
+                    required
+                />
+            </div>
+            <div>
+                <input
+                    type="password"
+                    v-model="password"
+                    placeholder="Senha"
+                    required
+                />
+            </div>
+            <div>
+                <button type="submit" :disabled="isLoading">
+                    {{ isLoading ? 'Entrando...' : 'Login' }}
+                </button>
+            </div>
+            <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </form>
+        <div class="register-link">
+            <p>
+                Não tem uma conta?
+                <router-link to="/register">Cadastre-se aqui</router-link>
+            </p>
+        </div>
     </div>
 </template>
 
 <script>
-import api from '../services/axiosConfig';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     data() {
         return {
             username: '',
             password: '',
-            errorMessage: null,
         };
     },
+    computed: {
+        ...mapState(['isAuthenticated', 'isLoading', 'errorMessage']),
+    },
     methods: {
-        async login() {
+        ...mapActions(['login']),
+        async handleLogin() {
+            this.$store.commit('setErrorMessage', null);
             try {
-                await api.post('/api/users/login/', {
+                const response = await this.login({
                     username: this.username,
                     password: this.password,
                 });
-                this.$router.push('/dashboard');
+
+                if (response && this.isAuthenticated) {
+                    this.$router.push('/dashboard');
+                }
             } catch (error) {
-                this.errorMessage = 'Credenciais inválidas.';
+                this.$store.commit(
+                    'setErrorMessage',
+                    'Credenciais inválidas ou erro no servidor.',
+                );
             }
         },
     },
@@ -58,12 +82,19 @@ form {
 input {
     display: block;
     margin-bottom: 10px;
+    padding: 8px;
+    width: 200px;
 }
 button {
     margin-top: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
 }
 .error {
     color: red;
     margin-top: 10px;
+}
+.register-link {
+    margin-top: 20px;
 }
 </style>

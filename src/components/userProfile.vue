@@ -2,10 +2,10 @@
     <div class="user-profile">
         <div class="profile-img-container" @click="editProfileImage">
             <img
-                :src="profileImage"
+                :src="user?.profile_image"
                 alt="Profile Image"
                 class="profile-img"
-                v-if="profileImage"
+                v-if="user?.profile_image"
             />
             <input
                 type="file"
@@ -15,11 +15,11 @@
                 accept="image/*"
             />
         </div>
-        <h2 v-if="username">{{ username }}</h2>
+        <h2 v-if="user?.username">{{ user.username }}</h2>
         <h2 v-else>Usuário não encontrado</h2>
-        <p>{{ followersCount }} seguidores</p>
+        <p>{{ user?.followers_count || 0 }} seguidores</p>
         <div>
-            <p v-if="!isEditingBio">{{ bio || 'Escreva sobre você' }}</p>
+            <p v-if="!isEditingBio">{{ user?.bio || 'Escreva sobre você' }}</p>
             <div v-if="isEditingBio">
                 <textarea v-model="newBio" maxlength="300"></textarea>
                 <div class="buttons">
@@ -39,23 +39,23 @@
 </template>
 
 <script>
-import api from '@/services/axiosConfig';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     data() {
         return {
-            profileImage: null,
-            username: '',
-            bio: '',
             newBio: '',
             isEditingBio: false,
-            followersCount: 0,
             isSaving: false, // Controle de estado durante o salvamento
             errorMessage: null,
             successMessage: null,
         };
     },
+    computed: {
+        ...mapState(['user']),
+    },
     methods: {
+        ...mapActions(['updateProfileImage', 'updateBio']),
         editProfileImage() {
             this.$refs.fileInput.click(); // Abre a seleção de arquivo para upload
         },
@@ -65,29 +65,19 @@ export default {
             if (file && file.size <= 2 * 1024 * 1024) {
                 // Limite de 2MB
                 const formData = new FormData();
-                formData.append('profile_image', file); // Adiciona o arquivo ao FormData
+                formData.append('profile_image', file);
 
                 this.isSaving = true;
                 this.errorMessage = null;
                 this.successMessage = null;
 
                 try {
-                    const response = await api.patch(
-                        '/api/users/me/',
-                        formData,
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data', // Configura o cabeçalho para multipart/form-data
-                            },
-                        },
-                    );
-                    this.profileImage = response.data.profile_image; // Atualiza a imagem de perfil
+                    await this.updateProfileImage(formData);
                     this.successMessage =
                         'Imagem de perfil atualizada com sucesso!';
-                } catch (error) {
+                } catch {
                     this.errorMessage =
                         'Erro ao fazer upload da imagem. Tente novamente mais tarde.';
-                    console.error('Erro ao fazer upload da imagem.', error); // Mensagem de erro
                 } finally {
                     this.isSaving = false;
                 }
@@ -98,7 +88,7 @@ export default {
         },
         editBio() {
             this.isEditingBio = true;
-            this.newBio = this.bio;
+            this.newBio = this.user?.bio || '';
         },
         async confirmEditBio() {
             if (this.newBio.length > 300) {
@@ -112,47 +102,20 @@ export default {
             this.successMessage = null;
 
             try {
-                const response = await api.patch('/api/users/me/', {
-                    bio: this.newBio,
-                });
-                this.bio = response.data.bio;
+                await this.updateBio(this.newBio);
                 this.successMessage = 'Biografia atualizada com sucesso!';
                 this.isEditingBio = false;
-            } catch (error) {
+            } catch {
                 this.errorMessage =
                     'Erro ao atualizar biografia. Tente novamente mais tarde.';
-                console.error('Erro ao atualizar biografia.', error); // Mensagem de erro
             } finally {
                 this.isSaving = false;
             }
         },
         cancelEditBio() {
             this.isEditingBio = false;
-            this.newBio = this.bio;
+            this.newBio = this.user?.bio || '';
         },
-    },
-    async mounted() {
-        this.errorMessage = null;
-
-        try {
-            const response = await api.get('/api/users/me/');
-            if (response.data) {
-                this.username =
-                    response.data.username || 'Usuário não encontrado';
-                this.bio = response.data.bio || 'Escreva sobre você';
-                this.profileImage = response.data.profile_image;
-                this.followersCount = response.data.followers_count || 0;
-            } else {
-                this.errorMessage = 'Erro ao carregar perfil.';
-                console.error(
-                    'Dados do usuário não encontrados na resposta da API',
-                );
-            }
-        } catch (error) {
-            this.errorMessage =
-                'Erro ao carregar perfil. Tente novamente mais tarde.';
-            console.error('Erro ao carregar perfil.', error); // Mensagem de erro
-        }
     },
 };
 </script>

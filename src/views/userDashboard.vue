@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="sidebar">
-            <UserProfile :userProfile="userProfile" />
+            <UserProfile :userProfile="user" />
         </div>
         <div class="main-content">
             <TweetFeed />
@@ -16,7 +16,7 @@
 import UserProfile from '@/components/userProfile.vue';
 import TweetFeed from '@/components/tweetFeed.vue';
 import UserList from '@/components/userList.vue';
-import api from '@/services/axiosConfig';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     name: 'UserDashboard',
@@ -25,36 +25,27 @@ export default {
         TweetFeed,
         UserList,
     },
-    data() {
-        return {
-            userProfile: null,
-            isLoading: true,
-            errorMessage: null,
-        };
+    computed: {
+        ...mapState(['user', 'isLoading', 'errorMessage']),
     },
-    async mounted() {
-        await this.loadUserProfile();
+    async created() {
+        // Verifica se o usuário está autenticado antes de carregar o perfil
+        if (!this.isAuthenticated) {
+            this.$router.push('/login');
+        } else {
+            await this.fetchUserProfile();
+        }
     },
     methods: {
-        async loadUserProfile() {
-            this.isLoading = true;
-            this.errorMessage = null;
-
+        ...mapActions(['fetchUser', 'logout']),
+        async fetchUserProfile() {
             try {
-                const response = await api.get('/api/users/me/'); // Requisição autenticada usando cookies
-
-                this.userProfile = response.data;
-            } catch (error) {
-                if (error.response && error.response.status === 401) {
-                    this.errorMessage =
-                        'Você não está autorizado. Faça login novamente.';
-                    this.$router.push('/login');
-                } else {
-                    this.errorMessage =
-                        'Erro ao carregar perfil. Tente novamente mais tarde.';
-                }
-            } finally {
-                this.isLoading = false;
+                await this.fetchUser();
+            } catch {
+                this.errorMessage =
+                    'Erro ao carregar perfil. Faça login novamente.';
+                this.logout(); // Limpa o estado de autenticação
+                this.$router.push('/login'); // Redireciona para o login
             }
         },
     },

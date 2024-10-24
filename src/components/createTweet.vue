@@ -8,60 +8,50 @@
         ></textarea>
         <button
             @click="postTweet"
-            :disabled="isPosting || !tweetContent.trim()"
+            :disabled="isLoading || !tweetContent.trim()"
         >
-            {{ isPosting ? 'Posting...' : 'Tweet' }}
+            {{ isLoading ? 'Posting...' : 'Tweet' }}
         </button>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
 </template>
 
 <script>
-import api from '@/services/axiosConfig';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     name: 'CreateTweet',
     data() {
         return {
-            tweetContent: '',
-            isPosting: false, // Controle de estado de postagem
-            errorMessage: null, // Mensagem de erro
+            tweetContent: '', // Armazena o conteúdo do novo tweet
         };
     },
+    computed: {
+        ...mapState({
+            isLoading: (state) => state.isLoading, // Controle de carregamento do Vuex
+            errorMessage: (state) => state.errorMessage, // Mensagem de erro do Vuex
+        }),
+    },
     methods: {
+        ...mapActions(['createTweet']),
         async postTweet() {
-            // Impede o envio se o conteúdo estiver vazio
             if (!this.tweetContent.trim()) {
-                this.errorMessage = 'Tweet content cannot be empty.';
+                // Impede o envio se o conteúdo estiver vazio
+                this.$store.commit(
+                    'setErrorMessage',
+                    'Tweet content cannot be empty.',
+                );
                 return;
             }
 
-            this.isPosting = true;
-            this.errorMessage = null;
-
             try {
-                // Faz a requisição POST para a API de tweets
-                const response = await api.post('/tweets/', {
-                    content: this.tweetContent.trim(),
-                });
+                // Chama a action para criar o tweet via Vuex
+                await this.createTweet({ content: this.tweetContent.trim() });
 
                 // Limpa o campo após o envio bem-sucedido
                 this.tweetContent = '';
-
-                // Atualiza o feed de tweets (comunicação com o componente pai)
-                this.$emit('tweet-posted', response.data);
             } catch (error) {
-                // Tratamento de erro
-                if (error.response) {
-                    this.errorMessage =
-                        error.response.data?.detail ||
-                        'Failed to post the tweet. Please try again.';
-                } else {
-                    this.errorMessage =
-                        'Failed to post the tweet. Please check your internet connection.';
-                }
-            } finally {
-                this.isPosting = false;
+                // A mensagem de erro já é gerenciada pelo Vuex
             }
         },
     },

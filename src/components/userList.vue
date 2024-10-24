@@ -23,49 +23,19 @@
 </template>
 
 <script>
-import api from '@/services/axiosConfig';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     name: 'UserList',
-    data() {
-        return {
-            users: [],
-            errorMessage: null,
-            isLoading: false, // Adiciona estado de carregamento
-        };
+    computed: {
+        ...mapState(['users', 'isLoading', 'errorMessage']),
     },
     async mounted() {
-        await this.loadUsers(); // Carregar lista de usuários ao montar o componente
+        // Carregar lista de usuários ao montar o componente
+        await this.loadUsers();
     },
     methods: {
-        async loadUsers() {
-            try {
-                // Atualiza o caminho para buscar os usuários sugeridos corretamente
-                const response = await api.get('users/suggested_users/');
-                this.users = response.data;
-            } catch (error) {
-                this.errorMessage = 'Falha ao carregar usuários.';
-                console.error('Erro ao carregar usuários:', error); // Log de erro
-            }
-        },
-        async followUser(userId) {
-            this.isLoading = true; // Ativa estado de carregamento durante a ação
-            try {
-                await api.post(`users/${userId}/follow_user/`, {}); // Envia requisição de seguir usuário
-                // Atualiza o status de "isFollowing" do usuário após sucesso
-                this.users = this.users.map((user) => {
-                    if (user.id === userId) {
-                        user.isFollowing = true;
-                    }
-                    return user;
-                });
-            } catch (error) {
-                this.errorMessage = 'Falha ao seguir o usuário.';
-                console.error('Erro ao seguir usuário:', error); // Log de erro
-            } finally {
-                this.isLoading = false; // Desativa estado de carregamento
-            }
-        },
+        ...mapActions(['loadUsers', 'followUser']),
     },
 };
 </script>
@@ -87,7 +57,7 @@ export default {
     height: 50px;
     border-radius: 50%;
     margin-right: 10px;
-    object-fit: cover; /* Ajusta a imagem para cobrir o espaço sem distorção */
+    object-fit: cover;
 }
 .error {
     color: red;
@@ -100,7 +70,7 @@ export default {
     margin-bottom: 20px;
 }
 button:disabled {
-    background-color: grey; /* Indica quando o botão está desabilitado */
+    background-color: grey;
     cursor: not-allowed;
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
     <div class="signup-container">
-        <h1>Sign Up</h1>
-        <form @submit.prevent="signUp">
+        <h1>Cadastro</h1>
+        <form @submit.prevent="handleSignUp">
             <div>
                 <input
                     type="text"
                     v-model="username"
-                    placeholder="Username"
+                    placeholder="Nome de usuário"
                     required
                 />
             </div>
@@ -14,7 +14,7 @@
                 <input
                     type="password"
                     v-model="password"
-                    placeholder="Password"
+                    placeholder="Senha"
                     required
                 />
             </div>
@@ -22,22 +22,22 @@
                 <input
                     type="password"
                     v-model="confirmPassword"
-                    placeholder="Confirm Password"
+                    placeholder="Confirmar senha"
                     required
                 />
             </div>
             <button type="submit" :disabled="isLoading">
-                {{ isLoading ? 'Signing Up...' : 'Sign Up' }}
+                {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
             </button>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
             <p v-if="successMessage" class="success">{{ successMessage }}</p>
         </form>
-        <router-link to="/login">Login</router-link>
+        <router-link to="/login">Já possui uma conta? Login</router-link>
     </div>
 </template>
 
 <script>
-import api from '../services/axiosConfig';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     name: 'SignUpForm',
@@ -46,55 +46,37 @@ export default {
             username: '',
             password: '',
             confirmPassword: '',
-            isLoading: false,
-            errorMessage: null,
             successMessage: null,
         };
     },
+    computed: {
+        ...mapState(['isLoading', 'errorMessage']),
+    },
     methods: {
-        async signUp() {
+        ...mapActions(['signUp']),
+        async handleSignUp() {
             if (this.password !== this.confirmPassword) {
-                this.errorMessage = 'As senhas não coincidem';
-                this.successMessage = null;
+                this.$store.commit(
+                    'setErrorMessage',
+                    'As senhas não coincidem.',
+                );
                 this.confirmPassword = '';
                 return;
             }
 
-            this.isLoading = true;
-            this.errorMessage = null;
-            this.successMessage = null;
-
             try {
-                // Faz a requisição de cadastro
-                const response = await api.post('/api/users/', {
+                await this.signUp({
                     username: this.username,
                     password: this.password,
                 });
 
-                if (response.status === 201) {
-                    this.successMessage = 'Cadastro realizado com sucesso!';
-                    this.errorMessage = null;
-
-                    setTimeout(() => {
-                        this.$router.push('/login');
-                    }, 3000);
-                } else {
-                    this.errorMessage = 'Erro inesperado durante o cadastro.';
-                    this.successMessage = null;
-                }
-            } catch (error) {
-                if (error.response && error.response.status === 400) {
-                    this.errorMessage =
-                        error.response.data?.detail ||
-                        'Falha no cadastro. Tente um nome de usuário diferente.';
-                    this.successMessage = null;
-                } else {
-                    this.errorMessage =
-                        'Ocorreu um erro. Tente novamente mais tarde.';
-                    this.successMessage = null;
-                }
-            } finally {
-                this.isLoading = false;
+                this.successMessage = 'Cadastro realizado com sucesso!';
+                setTimeout(() => {
+                    this.$router.push('/login');
+                }, 3000);
+            } catch {
+                this.successMessage = null;
+                this.$store.commit('setErrorMessage', 'Falha no cadastro.');
             }
         },
     },
@@ -103,22 +85,29 @@ export default {
 
 <style scoped>
 .signup-container {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin-top: 50px;
 }
 input {
     display: block;
     margin-bottom: 10px;
+    padding: 8px;
+    width: 200px;
 }
 button {
     margin-top: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
 }
 .error {
     color: red;
     margin-top: 10px;
 }
 .success {
-    color: rgb(0, 255, 0);
+    color: green;
     margin-top: 10px;
 }
 </style>
