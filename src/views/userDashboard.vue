@@ -26,11 +26,12 @@ export default {
         UserList,
     },
     computed: {
-        ...mapState(['user', 'isLoading', 'errorMessage']),
+        ...mapState(['user', 'isLoading', 'errorMessage', 'isAuthenticated']),
     },
     async created() {
         // Verifica se o usuário está autenticado antes de carregar o perfil
         if (!this.isAuthenticated) {
+            console.warn('Usuário não autenticado, redirecionando para o login.');
             this.$router.push('/login');
         } else {
             await this.fetchUserProfile();
@@ -41,9 +42,9 @@ export default {
         async fetchUserProfile() {
             try {
                 await this.fetchUser();
-            } catch {
-                this.errorMessage =
-                    'Erro ao carregar perfil. Faça login novamente.';
+            } catch (error) {
+                console.error('Erro ao carregar perfil:', error);
+                this.errorMessage = 'Erro ao carregar perfil. Faça login novamente.';
                 this.logout(); // Limpa o estado de autenticação
                 this.$router.push('/login'); // Redireciona para o login
             }

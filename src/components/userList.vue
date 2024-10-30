@@ -2,19 +2,19 @@
     <div class="user-list">
         <h3>Usuários Sugeridos</h3>
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-        <div v-else-if="users.length === 0" class="no-users">
+        <div v-else-if="!users || users.length === 0" class="no-users">
             Não existem usuários.
         </div>
         <div v-else>
             <div v-for="user in users" :key="user.id" class="user-item">
-                <img :src="user.profile_image" alt="Profile" class="user-img" />
+                <img :src="user.profile_image_url" alt="Profile" class="user-img" />
                 <div>
                     <p>{{ user.username }}</p>
                     <button
                         @click="followUser(user.id)"
-                        :disabled="user.isFollowing || isLoading"
+                        :disabled="user.is_following || isLoading"
                     >
-                        {{ user.isFollowing ? 'Seguindo' : 'Seguir' }}
+                        {{ user.is_following ? 'Seguindo' : 'Seguir' }}
                     </button>
                 </div>
             </div>
@@ -28,14 +28,28 @@ import { mapActions, mapState } from 'vuex';
 export default {
     name: 'UserList',
     computed: {
-        ...mapState(['users', 'isLoading', 'errorMessage']),
+        ...mapState({
+            users: (state) => state.users,
+            isLoading: (state) => state.isLoading,
+            errorMessage: (state) => state.errorMessage,
+        }),
     },
     async mounted() {
-        // Carregar lista de usuários ao montar o componente
-        await this.loadUsers();
+        try {
+            await this.loadUsers(); // Carrega a lista de usuários ao montar o componente
+        } catch (error) {
+            console.error('Erro ao carregar usuários:', error);
+        }
     },
     methods: {
         ...mapActions(['loadUsers', 'followUser']),
+        async followUser(userId) {
+            try {
+                await this.$store.dispatch('followUser', userId);
+            } catch (error) {
+                console.error('Erro ao seguir usuário:', error);
+            }
+        },
     },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div class="user-profile">
-        <div class="profile-img-container" @click="editProfileImage">
+        <div class="profile-img-container" @click="triggerFileUpload">
             <img
                 :src="user?.profile_image"
                 alt="Profile Image"
@@ -18,6 +18,7 @@
         <h2 v-if="user?.username">{{ user.username }}</h2>
         <h2 v-else>Usuário não encontrado</h2>
         <p>{{ user?.followers_count || 0 }} seguidores</p>
+
         <div>
             <p v-if="!isEditingBio">{{ user?.bio || 'Escreva sobre você' }}</p>
             <div v-if="isEditingBio">
@@ -33,6 +34,7 @@
                 Editar Biografia
             </button>
         </div>
+
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         <p v-if="successMessage" class="success">{{ successMessage }}</p>
     </div>
@@ -46,7 +48,7 @@ export default {
         return {
             newBio: '',
             isEditingBio: false,
-            isSaving: false, // Controle de estado durante o salvamento
+            isSaving: false,
             errorMessage: null,
             successMessage: null,
         };
@@ -56,14 +58,15 @@ export default {
     },
     methods: {
         ...mapActions(['updateProfileImage', 'updateBio']),
-        editProfileImage() {
-            this.$refs.fileInput.click(); // Abre a seleção de arquivo para upload
+
+        triggerFileUpload() {
+            this.$refs.fileInput.click(); // Abre o seletor de arquivo
         },
+
         async uploadImage(event) {
-            const file = event.target.files[0]; // Obtém o arquivo selecionado
+            const file = event.target.files[0];
 
             if (file && file.size <= 2 * 1024 * 1024) {
-                // Limite de 2MB
                 const formData = new FormData();
                 formData.append('profile_image', file);
 
@@ -77,19 +80,20 @@ export default {
                         'Imagem de perfil atualizada com sucesso!';
                 } catch {
                     this.errorMessage =
-                        'Erro ao fazer upload da imagem. Tente novamente mais tarde.';
+                        'Erro ao atualizar a imagem. Tente novamente.';
                 } finally {
                     this.isSaving = false;
                 }
             } else {
-                this.errorMessage =
-                    'O arquivo de imagem deve ser menor que 2MB.';
+                this.errorMessage = 'O arquivo deve ser menor que 2MB.';
             }
         },
+
         editBio() {
             this.isEditingBio = true;
             this.newBio = this.user?.bio || '';
         },
+
         async confirmEditBio() {
             if (this.newBio.length > 300) {
                 this.errorMessage =
@@ -102,16 +106,17 @@ export default {
             this.successMessage = null;
 
             try {
-                await this.updateBio(this.newBio);
+                await this.updateBio({ bio: this.newBio });
                 this.successMessage = 'Biografia atualizada com sucesso!';
                 this.isEditingBio = false;
             } catch {
                 this.errorMessage =
-                    'Erro ao atualizar biografia. Tente novamente mais tarde.';
+                    'Erro ao atualizar biografia. Tente novamente.';
             } finally {
                 this.isSaving = false;
             }
         },
+
         cancelEditBio() {
             this.isEditingBio = false;
             this.newBio = this.user?.bio || '';

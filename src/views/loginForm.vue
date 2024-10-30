@@ -51,20 +51,26 @@ export default {
         ...mapActions(['login']),
         async handleLogin() {
             this.$store.commit('setErrorMessage', null);
-            try {
-                const response = await this.login({
-                    username: this.username,
-                    password: this.password,
-                });
 
-                if (response && this.isAuthenticated) {
+            // Verifica se os campos estão preenchidos
+            if (!this.username || !this.password) {
+                this.$store.commit('setErrorMessage', 'Por favor, preencha todos os campos.');
+                console.warn('Campos de login não preenchidos.');
+                return;
+            }
+
+            try {
+                // Tenta realizar o login
+                await this.login({ username: this.username, password: this.password });
+
+                // Verifica se o usuário foi autenticado
+                if (this.isAuthenticated) {
+                    console.log('Login bem-sucedido, redirecionando para o dashboard.');
                     this.$router.push('/dashboard');
                 }
             } catch (error) {
-                this.$store.commit(
-                    'setErrorMessage',
-                    'Credenciais inválidas ou erro no servidor.',
-                );
+                console.error('Erro durante o login:', error);
+                this.$store.commit('setErrorMessage', error.response?.data?.detail || 'Credenciais inválidas ou erro no servidor.');
             }
         },
     },

@@ -55,12 +55,12 @@ export default {
     methods: {
         ...mapActions(['signUp']),
         async handleSignUp() {
+            // Verifica se as senhas correspondem
             if (this.password !== this.confirmPassword) {
                 this.$store.commit(
                     'setErrorMessage',
                     'As senhas não coincidem.',
                 );
-                this.confirmPassword = '';
                 return;
             }
 
@@ -68,12 +68,13 @@ export default {
                 await this.signUp({
                     username: this.username,
                     password: this.password,
+                    confirm_password: this.confirmPassword,
                 });
 
                 this.successMessage = 'Cadastro realizado com sucesso!';
                 setTimeout(() => {
                     this.$router.push('/login');
-                }, 3000);
+                }, 2000);
             } catch {
                 this.successMessage = null;
                 this.$store.commit('setErrorMessage', 'Falha no cadastro.');

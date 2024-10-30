@@ -11,7 +11,7 @@
                 @click="createTweet"
                 :disabled="isLoading || !newTweetContent"
             >
-                {{ isLoading ? 'Posting...' : 'Tweet' }}
+                {{ isLoading ? 'Publicando...' : 'Tweetar' }}
             </button>
         </div>
 
@@ -20,7 +20,7 @@
 
         <!-- Mensagens de erro e carregamento -->
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-        <p v-if="isLoading && tweets.length === 0">Loading tweets...</p>
+        <p v-if="isLoading && tweets.length === 0">Carregando tweets...</p>
     </div>
 </template>
 
@@ -40,13 +40,17 @@ export default {
     },
     computed: {
         ...mapState({
-            tweets: (state) => state.tweets, // Lista de tweets do Vuex
-            isLoading: (state) => state.isLoading, // Estado de carregamento do Vuex
-            errorMessage: (state) => state.errorMessage, // Mensagem de erro do Vuex
+            tweets: (state) => state.tweets,
+            isLoading: (state) => state.isLoading,
+            errorMessage: (state) => state.errorMessage,
         }),
     },
     async mounted() {
-        await this.fetchTweets(); // Carrega os tweets ao montar o componente
+        try {
+            await this.fetchTweets(); // Carrega os tweets ao montar o componente
+        } catch (error) {
+            console.error('Erro ao carregar tweets:', error);
+        }
     },
     methods: {
         ...mapActions(['fetchTweets', 'createTweet']),
@@ -54,10 +58,10 @@ export default {
             if (!this.newTweetContent) return;
 
             try {
-                await this.createTweet({ content: this.newTweetContent });
+                await this.$store.dispatch('createTweet', { content: this.newTweetContent });
                 this.newTweetContent = ''; // Limpa o campo de criação de tweet após postagem
             } catch (error) {
-                // O Vuex já gerencia o erro e o estado de carregamento
+                console.error('Erro ao criar tweet:', error);
             }
         },
     },
@@ -96,3 +100,4 @@ button:disabled {
     margin-top: 10px;
 }
 </style>
+    

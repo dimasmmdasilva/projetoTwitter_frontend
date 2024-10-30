@@ -35,19 +35,14 @@ const router = createRouter({
 });
 
 // Middleware de verificação de autenticação antes de cada navegação
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
     const isAuthenticated = store.getters.isAuthenticated;
 
     if (to.meta.requiresAuth && !isAuthenticated) {
         // Se a rota exige autenticação e o usuário não está autenticado, redireciona para login
-        console.log('Usuário não autenticado. Redirecionando para login.');
         next('/login');
-    } else if (
-        isAuthenticated &&
-        (to.path === '/login' || to.path === '/register')
-    ) {
-        // Se o usuário já está autenticado e tenta acessar login ou registro, redireciona para dashboard
-        console.log('Usuário já autenticado. Redirecionando para dashboard.');
+    } else if ((to.name === 'Login' || to.name === 'Register') && isAuthenticated) {
+        // Se o usuário já está autenticado e tenta acessar login ou registro, redireciona para o dashboard
         next('/dashboard');
     } else {
         // Prossegue para a rota desejada
