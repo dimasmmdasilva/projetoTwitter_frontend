@@ -85,6 +85,21 @@ const store = createStore({
             if (refreshToken) commit('setRefreshToken', refreshToken);
             if (user) commit('setUser', user);
         },
+        async signUp({ commit }, userData) {
+            commit('setLoading', true);
+            commit('setErrorMessage', null);
+
+            try {
+                await api.post('/users/', userData);
+                commit('setSuccessMessage', 'Cadastro realizado com sucesso!');
+            } catch (error) {
+                const errorMsg = error.response?.data?.detail || 'Erro ao criar conta.';
+                console.error('[Erro durante o cadastro]:', errorMsg);
+                commit('setErrorMessage', errorMsg);
+            } finally {
+                commit('setLoading', false);
+            }
+        },
         async login({ commit, dispatch }, credentials) {
             commit('setLoading', true);
             commit('setErrorMessage', null);
@@ -165,6 +180,11 @@ const store = createStore({
             }
         },
         async refreshToken({ commit, state }) {
+            if (!state.refreshToken) {
+                console.warn('[Aviso] Nenhum token de atualização encontrado.');
+                return;
+            }
+
             try {
                 const response = await api.post('/token/refresh/', { refresh: state.refreshToken });
                 commit('setToken', response.data.access);
