@@ -4,7 +4,7 @@ import router from '../router/index';
 
 // Configuração inicial do Axios
 const api = axios.create({
-    baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8000/api/',
+    baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8000/api',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
@@ -17,15 +17,15 @@ api.interceptors.request.use(
     (config) => {
         const token = store.state.token;
         if (token) {
-            console.log('Adicionando token de autorização ao cabeçalho.');
+            console.log('[Axios] Adicionando token de autorização ao cabeçalho.');
             config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
     },
     (error) => {
-        console.error('Erro no interceptor de requisição:', error);
+        console.error('[Axios] Erro no interceptor de requisição:', error);
         return Promise.reject(error);
-    },
+    }
 );
 
 // Interceptor de resposta para lidar com erros de autenticação e renovação de token
@@ -33,26 +33,30 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const { response } = error;
 
         // Verifica se houve erro de autorização (401) e tenta renovar o token
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+        if (response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                console.log('Tentando renovar o token de acesso...');
+                console.log('[Axios] Tentando renovar o token de acesso...');
                 await store.dispatch('refreshToken');
-                return api(originalRequest);
+                console.log('[Axios] Token renovado com sucesso.');
+                return api(originalRequest); // Reenvia a requisição original após a renovação do token
             } catch (refreshError) {
-                console.error('Erro ao renovar o token:', refreshError);
-                store.dispatch('logout');
+                console.error('[Axios] Erro ao renovar o token:', refreshError);
+                store.dispatch('logout');  // Realiza logout seguro
                 router.push('/login');
                 return Promise.reject(refreshError);
             }
         }
 
-        // Define mensagem de erro no estado Vuex
-        store.commit('setErrorMessage', error.response?.data?.detail || 'Erro de autenticação.');
+        // Define mensagem de erro no estado Vuex e retorna erro
+        const errorMsg = response?.data?.detail || 'Erro de autenticação.';
+        store.commit('setErrorMessage', errorMsg);
+        console.error('[Axios] Erro na resposta:', errorMsg);
         return Promise.reject(error);
-    },
+    }
 );
 
 export default api;

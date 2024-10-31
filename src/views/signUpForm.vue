@@ -46,21 +46,20 @@ export default {
             username: '',
             password: '',
             confirmPassword: '',
-            successMessage: null,
         };
     },
     computed: {
-        ...mapState(['isLoading', 'errorMessage']),
+        ...mapState(['isLoading', 'errorMessage', 'successMessage']),
     },
     methods: {
         ...mapActions(['signUp']),
         async handleSignUp() {
+            // Limpa o estado de erro antes de iniciar o cadastro
+            this.$store.commit('setErrorMessage', null);
+
             // Verifica se as senhas correspondem
             if (this.password !== this.confirmPassword) {
-                this.$store.commit(
-                    'setErrorMessage',
-                    'As senhas não coincidem.',
-                );
+                this.$store.commit('setErrorMessage', 'As senhas não coincidem.');
                 return;
             }
 
@@ -71,13 +70,12 @@ export default {
                     confirm_password: this.confirmPassword,
                 });
 
-                this.successMessage = 'Cadastro realizado com sucesso!';
+                this.$store.commit('setSuccessMessage', 'Cadastro realizado com sucesso!');
                 setTimeout(() => {
                     this.$router.push('/login');
-                }, 2000);
-            } catch {
-                this.successMessage = null;
-                this.$store.commit('setErrorMessage', 'Falha no cadastro.');
+                }, 5000);
+            } catch (error) {
+                // A mensagem de erro já é gerenciada pelo Vuex
             }
         },
     },

@@ -2,35 +2,26 @@
     <div class="login-container">
         <h1>Login</h1>
         <form @submit.prevent="handleLogin">
-            <div>
-                <input
-                    type="text"
-                    v-model="username"
-                    placeholder="Nome de usuário"
-                    required
-                />
-            </div>
-            <div>
-                <input
-                    type="password"
-                    v-model="password"
-                    placeholder="Senha"
-                    required
-                />
-            </div>
-            <div>
-                <button type="submit" :disabled="isLoading">
-                    {{ isLoading ? 'Entrando...' : 'Login' }}
-                </button>
-            </div>
+            <input
+                type="text"
+                v-model="username"
+                placeholder="Nome de usuário"
+                required
+            />
+            <input
+                type="password"
+                v-model="password"
+                placeholder="Senha"
+                required
+            />
+            <button type="submit" :disabled="isLoading">
+                {{ isLoading ? 'Entrando...' : 'Login' }}
+            </button>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </form>
-        <div class="register-link">
-            <p>
-                Não tem uma conta?
-                <router-link to="/register">Cadastre-se aqui</router-link>
-            </p>
-        </div>
+        <p>
+            Não tem uma conta? <router-link to="/register">Cadastre-se aqui</router-link>
+        </p>
     </div>
 </template>
 
@@ -50,27 +41,26 @@ export default {
     methods: {
         ...mapActions(['login']),
         async handleLogin() {
+            // Limpa mensagens de erro antes de tentar o login
             this.$store.commit('setErrorMessage', null);
 
-            // Verifica se os campos estão preenchidos
+            // Verifica se os campos de login estão preenchidos
             if (!this.username || !this.password) {
                 this.$store.commit('setErrorMessage', 'Por favor, preencha todos os campos.');
-                console.warn('Campos de login não preenchidos.');
                 return;
             }
 
             try {
-                // Tenta realizar o login
+                // Chama a action de login do Vuex com as credenciais do usuário
                 await this.login({ username: this.username, password: this.password });
 
-                // Verifica se o usuário foi autenticado
+                // Redireciona para o dashboard se o usuário estiver autenticado
                 if (this.isAuthenticated) {
-                    console.log('Login bem-sucedido, redirecionando para o dashboard.');
                     this.$router.push('/dashboard');
                 }
             } catch (error) {
-                console.error('Erro durante o login:', error);
-                this.$store.commit('setErrorMessage', error.response?.data?.detail || 'Credenciais inválidas ou erro no servidor.');
+                const errorMsg = error.response?.data?.detail || 'Credenciais inválidas ou erro no servidor.';
+                this.$store.commit('setErrorMessage', errorMsg);
             }
         },
     },
@@ -99,8 +89,5 @@ button {
 .error {
     color: red;
     margin-top: 10px;
-}
-.register-link {
-    margin-top: 20px;
 }
 </style>

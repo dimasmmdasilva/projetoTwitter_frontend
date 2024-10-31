@@ -1,20 +1,20 @@
 import { createStore } from 'vuex';
 import api from './services/axiosConfig';
-import jwtDecode from 'jwt-decode';
 
 const store = createStore({
     state: {
         token: localStorage.getItem('accessToken') || null,
         refreshToken: localStorage.getItem('refreshToken') || null,
-        isAuthenticated: !!localStorage.getItem('accessToken'),
         user: JSON.parse(localStorage.getItem('user')) || null,
+        isAuthenticated: !!localStorage.getItem('accessToken'),
+        tweets: [],
         isLoading: false,
         errorMessage: null,
         successMessage: null,
     },
     mutations: {
         setToken(state, token) {
-            console.log('Mutação: Armazenando token de acesso.', token);
+            console.log('[Mutação] Armazenando token de acesso:', token);
             state.token = token;
             state.isAuthenticated = !!token;
             if (token) {
@@ -26,7 +26,7 @@ const store = createStore({
             }
         },
         setRefreshToken(state, refreshToken) {
-            console.log('Mutação: Armazenando token de atualização.', refreshToken);
+            console.log('[Mutação] Armazenando token de atualização:', refreshToken);
             state.refreshToken = refreshToken;
             if (refreshToken) {
                 localStorage.setItem('refreshToken', refreshToken);
@@ -35,7 +35,7 @@ const store = createStore({
             }
         },
         setUser(state, user) {
-            console.log('Mutação: Armazenando dados do usuário.', user);
+            console.log('[Mutação] Armazenando dados do usuário:', user);
             state.user = user;
             if (user) {
                 localStorage.setItem('user', JSON.stringify(user));
@@ -43,8 +43,16 @@ const store = createStore({
                 localStorage.removeItem('user');
             }
         },
+        setTweets(state, tweets) {
+            console.log('[Mutação] Armazenando tweets:', tweets);
+            state.tweets = tweets;
+        },
+        addTweet(state, tweet) {
+            console.log('[Mutação] Adicionando novo tweet:', tweet);
+            state.tweets.unshift(tweet);
+        },
         clearAuth(state) {
-            console.log('Mutação: Limpando autenticação.');
+            console.log('[Mutação] Limpando autenticação.');
             state.token = null;
             state.refreshToken = null;
             state.isAuthenticated = false;
@@ -54,15 +62,15 @@ const store = createStore({
             localStorage.removeItem('user');
         },
         setLoading(state, isLoading) {
-            console.log(`Mutação: Alterando estado de carregamento para ${isLoading}`);
+            console.log(`[Mutação] Alterando estado de carregamento para: ${isLoading}`);
             state.isLoading = isLoading;
         },
         setErrorMessage(state, message) {
-            console.log('Mutação: Definindo mensagem de erro.', message);
+            console.log('[Mutação] Definindo mensagem de erro:', message);
             state.errorMessage = message;
         },
         setSuccessMessage(state, message) {
-            console.log('Mutação: Definindo mensagem de sucesso.', message);
+            console.log('[Mutação] Definindo mensagem de sucesso:', message);
             state.successMessage = message;
         },
     },
@@ -72,111 +80,102 @@ const store = createStore({
             const refreshToken = localStorage.getItem('refreshToken');
             const user = JSON.parse(localStorage.getItem('user'));
 
-            console.log('Ação: Inicializando store com tokens e usuário armazenado.');
-            if (accessToken) {
-                commit('setToken', accessToken);
-            }
-            if (refreshToken) {
-                commit('setRefreshToken', refreshToken);
-            }
-            if (user) {
-                commit('setUser', user);
-            }
+            console.log('[Ação] Inicializando store com tokens e usuário armazenado.');
+            if (accessToken) commit('setToken', accessToken);
+            if (refreshToken) commit('setRefreshToken', refreshToken);
+            if (user) commit('setUser', user);
         },
         async login({ commit, dispatch }, credentials) {
             commit('setLoading', true);
             commit('setErrorMessage', null);
 
-            console.log('Ação: Tentando login com credenciais.', credentials);
+            console.log('[Ação] Tentando login com credenciais:', credentials);
 
             try {
-                // Envio das credenciais para o servidor
                 const response = await api.post('/token/', credentials);
                 const { access, refresh } = response.data;
 
                 if (!access || !refresh) {
-                    console.error('Erro: Resposta de token inválida do servidor.', response.data);
+                    console.error('[Erro] Resposta de token inválida:', response.data);
                     throw new Error('Resposta de token inválida.');
                 }
 
-                console.log('Ação: Tokens recebidos com sucesso.', { access, refresh });
-
-                // Salva os tokens no estado e no localStorage
                 commit('setToken', access);
                 commit('setRefreshToken', refresh);
 
-                // Decodifica o token JWT para obter o ID do usuário
-                const decodedToken = jwtDecode(access);
-                const userId = decodedToken?.user_id;
-
-                if (userId) {
-                    console.log('Ação: Decodificação do token bem-sucedida. ID do usuário:', userId);
-                    await dispatch('fetchUser', userId);
-                } else {
-                    console.error('Erro: Token inválido.', decodedToken);
-                    throw new Error('Token inválido.');
-                }
+                await dispatch('fetchUserProfile');
 
                 commit('setSuccessMessage', 'Login realizado com sucesso!');
+                console.log('[Ação] Login realizado com sucesso.');
             } catch (error) {
                 const errorMsg = error.response?.data?.detail || 'Credenciais inválidas ou erro no servidor.';
-                console.error('Erro durante o login:', errorMsg);
+                console.error('[Erro durante o login]:', errorMsg);
                 commit('setErrorMessage', errorMsg);
-                throw error;
             } finally {
                 commit('setLoading', false);
             }
         },
-        async signUp({ commit }, credentials) {
+        async fetchUserProfile({ commit }) {
             commit('setLoading', true);
-            commit('setErrorMessage', null);
-
-            console.log('Ação: Tentando cadastro de novo usuário.', credentials);
+            console.log('[Ação] Buscando dados do perfil do usuário autenticado.');
 
             try {
-                await api.post('/users/', credentials);
-                commit('setSuccessMessage', 'Cadastro realizado com sucesso!');
-
-                // Adiciona um atraso de 5 segundos antes de redirecionar para login
-                setTimeout(() => {
-                    window.location.href = '/login'; // Redireciona para a página de login
-                }, 5000);
-            } catch (error) {
-                const errorMsg = error.response?.data?.detail || 'Erro no cadastro.';
-                console.error('Erro durante o cadastro:', errorMsg);
-                commit('setErrorMessage', errorMsg);
-
-                // NÃO redireciona para a página de login em caso de erro
-            } finally {
-                commit('setLoading', false);
-            }
-        },
-        async fetchUser({ commit }, userId) {
-            commit('setLoading', true);
-            commit('setErrorMessage', null);
-
-            console.log('Ação: Buscando dados do usuário com ID:', userId);
-
-            try {
-                const response = await api.get(`/users/${userId}/`);
-                if (response && response.data) {
-                    console.log('Ação: Dados do usuário recebidos com sucesso.', response.data);
+                const response = await api.get('/users/me/');
+                if (response?.data) {
                     commit('setUser', response.data);
                 } else {
-                    console.error('Erro: Resposta inválida do servidor ao buscar usuário.');
+                    console.error('[Erro] Resposta inválida ao obter perfil do usuário.');
                     throw new Error('Resposta inválida do servidor.');
                 }
             } catch (error) {
-                console.error('Erro ao obter dados do usuário:', error);
-                commit('clearAuth');
+                console.error('[Erro ao obter perfil do usuário]:', error);
                 commit('setErrorMessage', 'Erro ao obter dados do usuário.');
-                throw error;
+                commit('clearAuth');
             } finally {
                 commit('setLoading', false);
             }
         },
-        async logout({ commit }) {
-            console.log('Ação: Realizando logout.');
+        async fetchTweets({ commit }) {
+            commit('setLoading', true);
+            console.log('[Ação] Carregando tweets do servidor.');
+
+            try {
+                const response = await api.get('/tweets/');
+                commit('setTweets', response.data);
+            } catch (error) {
+                console.error('[Erro ao carregar tweets]:', error);
+                commit('setErrorMessage', 'Erro ao carregar tweets.');
+            } finally {
+                commit('setLoading', false);
+            }
+        },
+        async createTweet({ commit }, tweetData) {
+            commit('setLoading', true);
+            console.log('[Ação] Criando novo tweet:', tweetData);
+
+            try {
+                const response = await api.post('/tweets/', tweetData);
+                commit('addTweet', response.data);
+                commit('setSuccessMessage', 'Tweet criado com sucesso!');
+            } catch (error) {
+                console.error('[Erro ao criar tweet]:', error);
+                commit('setErrorMessage', 'Erro ao criar tweet.');
+            } finally {
+                commit('setLoading', false);
+            }
+        },
+        async refreshToken({ commit, state }) {
+            try {
+                const response = await api.post('/token/refresh/', { refresh: state.refreshToken });
+                commit('setToken', response.data.access);
+            } catch (error) {
+                console.error('[Erro ao renovar o token]:', error);
+                commit('setErrorMessage', 'Erro ao atualizar token.');
+                commit('clearAuth');
+            }
+        },
+        logout({ commit }) {
+            console.log('[Ação] Realizando logout.');
             commit('clearAuth');
             commit('setSuccessMessage', 'Logout realizado com sucesso!');
         },
@@ -187,6 +186,7 @@ const store = createStore({
         errorMessage: (state) => state.errorMessage,
         successMessage: (state) => state.successMessage,
         getUser: (state) => state.user,
+        getTweets: (state) => state.tweets,
     },
 });
 

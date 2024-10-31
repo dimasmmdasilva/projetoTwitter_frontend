@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="sidebar">
+        <div class="sidebar" v-if="user">
             <UserProfile :userProfile="user" />
         </div>
         <div class="main-content">
@@ -26,7 +26,12 @@ export default {
         UserList,
     },
     computed: {
-        ...mapState(['user', 'isLoading', 'errorMessage', 'isAuthenticated']),
+        ...mapState({
+            user: (state) => state.user,
+            isLoading: (state) => state.isLoading,
+            errorMessage: (state) => state.errorMessage,
+            isAuthenticated: (state) => state.isAuthenticated,
+        }),
     },
     async created() {
         // Verifica se o usuário está autenticado antes de carregar o perfil
@@ -34,18 +39,21 @@ export default {
             console.warn('Usuário não autenticado, redirecionando para o login.');
             this.$router.push('/login');
         } else {
+            console.log('Usuário autenticado, carregando o perfil.');
             await this.fetchUserProfile();
         }
     },
     methods: {
-        ...mapActions(['fetchUser', 'logout']),
+        ...mapActions(['fetchUserProfile', 'logout']),
         async fetchUserProfile() {
             try {
-                await this.fetchUser();
+                // Tenta buscar o perfil do usuário autenticado
+                await this.fetchUserProfile();
+                console.log('Perfil do usuário carregado com sucesso.');
             } catch (error) {
                 console.error('Erro ao carregar perfil:', error);
-                this.errorMessage = 'Erro ao carregar perfil. Faça login novamente.';
-                this.logout(); // Limpa o estado de autenticação
+                this.$store.commit('setErrorMessage', 'Erro ao carregar perfil. Faça login novamente.');
+                this.logout(); // Limpa o estado de autenticação no Vuex
                 this.$router.push('/login'); // Redireciona para o login
             }
         },

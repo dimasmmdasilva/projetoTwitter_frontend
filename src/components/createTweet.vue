@@ -12,6 +12,7 @@
         >
             {{ isLoading ? 'Posting...' : 'Tweet' }}
         </button>
+        <p v-if="successMessage" class="success">{{ successMessage }}</p>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
 </template>
@@ -30,6 +31,7 @@ export default {
         ...mapState({
             isLoading: (state) => state.isLoading, // Controle de carregamento do Vuex
             errorMessage: (state) => state.errorMessage, // Mensagem de erro do Vuex
+            successMessage: (state) => state.successMessage, // Mensagem de sucesso do Vuex
         }),
     },
     methods: {
@@ -37,10 +39,7 @@ export default {
         async postTweet() {
             if (!this.tweetContent.trim()) {
                 // Impede o envio se o conteúdo estiver vazio
-                this.$store.commit(
-                    'setErrorMessage',
-                    'Tweet content cannot be empty.',
-                );
+                this.$store.commit('setErrorMessage', 'Tweet content cannot be empty.');
                 return;
             }
 
@@ -50,8 +49,27 @@ export default {
 
                 // Limpa o campo após o envio bem-sucedido
                 this.tweetContent = '';
+                this.$store.commit('setSuccessMessage', 'Tweet posted successfully!');
             } catch (error) {
-                // A mensagem de erro já é gerenciada pelo Vuex
+                // Mensagem de erro já é gerenciada pelo Vuex
+                console.error('Error posting tweet:', error);
+            }
+        },
+    },
+    watch: {
+        // Limpa as mensagens de sucesso e erro após 3 segundos
+        successMessage(newVal) {
+            if (newVal) {
+                setTimeout(() => {
+                    this.$store.commit('setSuccessMessage', null);
+                }, 3000);
+            }
+        },
+        errorMessage(newVal) {
+            if (newVal) {
+                setTimeout(() => {
+                    this.$store.commit('setErrorMessage', null);
+                }, 3000);
             }
         },
     },
@@ -83,6 +101,10 @@ button:disabled {
 }
 .error {
     color: red;
+    margin-top: 10px;
+}
+.success {
+    color: green;
     margin-top: 10px;
 }
 </style>

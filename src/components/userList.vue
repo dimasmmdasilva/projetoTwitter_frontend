@@ -11,7 +11,7 @@
                 <div>
                     <p>{{ user.username }}</p>
                     <button
-                        @click="followUser(user.id)"
+                        @click="handleFollow(user.id)"
                         :disabled="user.is_following || isLoading"
                     >
                         {{ user.is_following ? 'Seguindo' : 'Seguir' }}
@@ -29,9 +29,9 @@ export default {
     name: 'UserList',
     computed: {
         ...mapState({
-            users: (state) => state.users,
-            isLoading: (state) => state.isLoading,
-            errorMessage: (state) => state.errorMessage,
+            users: (state) => state.users, // Lista de usuários carregada no Vuex
+            isLoading: (state) => state.isLoading, // Estado de carregamento
+            errorMessage: (state) => state.errorMessage, // Mensagens de erro
         }),
     },
     async mounted() {
@@ -39,15 +39,19 @@ export default {
             await this.loadUsers(); // Carrega a lista de usuários ao montar o componente
         } catch (error) {
             console.error('Erro ao carregar usuários:', error);
+            this.$store.commit('setErrorMessage', 'Erro ao carregar a lista de usuários.');
         }
     },
     methods: {
-        ...mapActions(['loadUsers', 'followUser']),
-        async followUser(userId) {
+        ...mapActions(['loadUsers', 'followUser']), // Ações Vuex para carregar usuários e seguir
+
+        async handleFollow(userId) {
             try {
-                await this.$store.dispatch('followUser', userId);
+                await this.followUser(userId); // Chamada Vuex para seguir o usuário
+                await this.loadUsers(); // Atualiza a lista de usuários após seguir
             } catch (error) {
                 console.error('Erro ao seguir usuário:', error);
+                this.$store.commit('setErrorMessage', 'Não foi possível seguir o usuário.');
             }
         },
     },

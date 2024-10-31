@@ -8,7 +8,7 @@
                 rows="3"
             ></textarea>
             <button
-                @click="createTweet"
+                @click="handleCreateTweet"
                 :disabled="isLoading || !newTweetContent"
             >
                 {{ isLoading ? 'Publicando...' : 'Tweetar' }}
@@ -50,18 +50,22 @@ export default {
             await this.fetchTweets(); // Carrega os tweets ao montar o componente
         } catch (error) {
             console.error('Erro ao carregar tweets:', error);
+            this.$store.commit('setErrorMessage', 'Erro ao carregar tweets.');
         }
     },
     methods: {
         ...mapActions(['fetchTweets', 'createTweet']),
-        async createTweet() {
+        
+        async handleCreateTweet() {
             if (!this.newTweetContent) return;
 
             try {
-                await this.$store.dispatch('createTweet', { content: this.newTweetContent });
+                // Chama a ação de criação de tweet no Vuex
+                await this.createTweet({ content: this.newTweetContent });
                 this.newTweetContent = ''; // Limpa o campo de criação de tweet após postagem
             } catch (error) {
                 console.error('Erro ao criar tweet:', error);
+                this.$store.commit('setErrorMessage', 'Erro ao criar tweet.');
             }
         },
     },
@@ -100,4 +104,3 @@ button:disabled {
     margin-top: 10px;
 }
 </style>
-    

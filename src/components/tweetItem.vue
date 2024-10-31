@@ -4,12 +4,8 @@
         <p>{{ tweet.content }}</p>
         <small>{{ formatDate(tweet.created_at) }}</small>
 
-        <!-- Botões de Curtir e Excluir -->
+        <!-- Botão de Exclusão -->
         <div class="tweet-actions">
-            <button @click="toggleLike">
-                {{ isLiked ? 'Unlike' : 'Like' }}
-            </button>
-            <p>Likes: {{ likesCount }}</p>
             <!-- Mostrar botão de exclusão apenas se o autor for o usuário autenticado -->
             <button v-if="isAuthor" @click="deleteTweet" class="delete-btn">
                 Delete
@@ -23,12 +19,6 @@ import { mapActions, mapGetters } from 'vuex';
 
 export default {
     props: ['tweet'],
-    data() {
-        return {
-            isLiked: this.tweet.is_liked_by_user, // Estado local de curtida
-            likesCount: this.tweet.likes_count, // Contagem de likes local
-        };
-    },
     computed: {
         ...mapGetters(['getUser']),
         isAuthor() {
@@ -37,7 +27,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions(['likeTweet', 'unlikeTweet', 'deleteTweet']),
+        ...mapActions(['deleteTweet']),
         formatDate(date) {
             const options = {
                 year: 'numeric',
@@ -47,22 +37,6 @@ export default {
                 minute: '2-digit',
             };
             return new Date(date).toLocaleDateString(undefined, options);
-        },
-        async toggleLike() {
-            try {
-                if (this.isLiked) {
-                    // Descurtir o tweet via Vuex
-                    await this.unlikeTweet(this.tweet.id);
-                    this.likesCount--; // Atualiza a contagem de likes localmente
-                } else {
-                    // Curtir o tweet via Vuex
-                    await this.likeTweet(this.tweet.id);
-                    this.likesCount++; // Atualiza a contagem de likes localmente
-                }
-                this.isLiked = !this.isLiked; // Alterna o estado de curtida
-            } catch (error) {
-                console.error('Erro ao curtir/descurtir o tweet:', error);
-            }
         },
         async deleteTweet() {
             // Confirmação antes de deletar o tweet
@@ -88,7 +62,6 @@ export default {
 .tweet-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
     margin-top: 5px;
 }
 

@@ -2,10 +2,10 @@
     <div class="user-profile">
         <div class="profile-img-container" @click="triggerFileUpload">
             <img
-                :src="user?.profile_image"
+                :src="user?.profile_image_url"
                 alt="Profile Image"
                 class="profile-img"
-                v-if="user?.profile_image"
+                v-if="user?.profile_image_url"
             />
             <input
                 type="file"
@@ -54,10 +54,12 @@ export default {
         };
     },
     computed: {
-        ...mapState(['user']),
+        ...mapState({
+            user: (state) => state.user, // Obtém os dados do usuário do Vuex
+        }),
     },
     methods: {
-        ...mapActions(['updateProfileImage', 'updateBio']),
+        ...mapActions(['updateProfileImage', 'updateBio', 'fetchUserProfile']), // Ações Vuex para atualizar a imagem e a biografia
 
         triggerFileUpload() {
             this.$refs.fileInput.click(); // Abre o seletor de arquivo
@@ -75,12 +77,12 @@ export default {
                 this.successMessage = null;
 
                 try {
-                    await this.updateProfileImage(formData);
-                    this.successMessage =
-                        'Imagem de perfil atualizada com sucesso!';
-                } catch {
-                    this.errorMessage =
-                        'Erro ao atualizar a imagem. Tente novamente.';
+                    await this.updateProfileImage(formData); // Chamada Vuex para atualizar a imagem
+                    this.successMessage = 'Imagem de perfil atualizada com sucesso!';
+                    await this.fetchUserProfile(); // Atualiza os dados do usuário no Vuex
+                } catch (error) {
+                    this.errorMessage = 'Erro ao atualizar a imagem. Tente novamente.';
+                    console.error('Erro ao atualizar imagem:', error);
                 } finally {
                     this.isSaving = false;
                 }
@@ -96,8 +98,7 @@ export default {
 
         async confirmEditBio() {
             if (this.newBio.length > 300) {
-                this.errorMessage =
-                    'A biografia não pode ter mais de 300 caracteres.';
+                this.errorMessage = 'A biografia não pode ter mais de 300 caracteres.';
                 return;
             }
 
@@ -106,12 +107,13 @@ export default {
             this.successMessage = null;
 
             try {
-                await this.updateBio({ bio: this.newBio });
+                await this.updateBio({ bio: this.newBio }); // Chamada Vuex para atualizar a bio
                 this.successMessage = 'Biografia atualizada com sucesso!';
                 this.isEditingBio = false;
-            } catch {
-                this.errorMessage =
-                    'Erro ao atualizar biografia. Tente novamente.';
+                await this.fetchUserProfile(); // Atualiza os dados do usuário no Vuex
+            } catch (error) {
+                this.errorMessage = 'Erro ao atualizar biografia. Tente novamente.';
+                console.error('Erro ao atualizar biografia:', error);
             } finally {
                 this.isSaving = false;
             }
@@ -122,6 +124,16 @@ export default {
             this.newBio = this.user?.bio || '';
         },
     },
+    async created() {
+        if (!this.user) {
+            try {
+                await this.fetchUserProfile();
+            } catch (error) {
+                console.error('Erro ao carregar perfil do usuário:', error);
+                this.errorMessage = 'Erro ao carregar perfil do usuário. Tente novamente.';
+            }
+        }
+    }
 };
 </script>
 
