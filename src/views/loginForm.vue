@@ -2,26 +2,14 @@
     <div class="login-container">
         <h1>Login</h1>
         <form @submit.prevent="handleLogin">
-            <input
-                type="text"
-                v-model="username"
-                placeholder="Nome de usuário"
-                required
-            />
-            <input
-                type="password"
-                v-model="password"
-                placeholder="Senha"
-                required
-            />
+            <input type="text" v-model="username" placeholder="Nome de usuário" required />
+            <input type="password" v-model="password" placeholder="Senha" required />
             <button type="submit" :disabled="isLoading">
                 {{ isLoading ? 'Entrando...' : 'Login' }}
             </button>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </form>
-        <p>
-            Não tem uma conta? <router-link to="/register">Cadastre-se aqui</router-link>
-        </p>
+        <p>Não tem uma conta? <router-link to="/register">Cadastre-se aqui</router-link></p>
     </div>
 </template>
 
@@ -41,26 +29,14 @@ export default {
     methods: {
         ...mapActions(['login']),
         async handleLogin() {
-            // Limpa mensagens de erro antes de tentar o login
             this.$store.commit('setErrorMessage', null);
-
-            // Verifica se os campos de login estão preenchidos
-            if (!this.username || !this.password) {
-                this.$store.commit('setErrorMessage', 'Por favor, preencha todos os campos.');
-                return;
-            }
-
             try {
-                // Chama a action de login do Vuex com as credenciais do usuário
                 await this.login({ username: this.username, password: this.password });
-
-                // Redireciona para o dashboard se o usuário estiver autenticado
                 if (this.isAuthenticated) {
                     this.$router.push('/dashboard');
                 }
             } catch (error) {
-                const errorMsg = error.response?.data?.detail || 'Credenciais inválidas ou erro no servidor.';
-                this.$store.commit('setErrorMessage', errorMsg);
+                this.$store.commit('setErrorMessage', 'Credenciais inválidas ou erro no servidor.');
             }
         },
     },
@@ -69,25 +45,40 @@ export default {
 
 <style scoped>
 .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 100px);
     text-align: center;
-    margin-top: 50px;
 }
+
 form {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
 }
+
 input {
     display: block;
     margin-bottom: 10px;
     padding: 8px;
-    width: 200px;
+    width: 100%;
 }
+
 button {
+    width: 100px; 
     margin-top: 10px;
-    padding: 10px 20px;
+    padding: 5px 10px; 
     cursor: pointer;
+    font-size: 12px;
 }
+
 .error {
     color: red;
     margin-top: 10px;
+    text-align: center;
 }
 </style>

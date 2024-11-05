@@ -10,7 +10,7 @@
             @click="postTweet"
             :disabled="isLoading || !tweetContent.trim()"
         >
-            {{ isLoading ? 'Posting...' : 'Tweet' }}
+            {{ isLoading ? 'Enviando...' : 'Tweet' }}
         </button>
         <p v-if="successMessage" class="success">{{ successMessage }}</p>
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -81,7 +81,7 @@ export default {
     margin-bottom: 20px;
 }
 textarea {
-    width: 100%;
+    width: 70%;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ddd;

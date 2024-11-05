@@ -1,8 +1,8 @@
 <template>
     <div class="signup-container">
         <h1>Cadastro</h1>
-        <form @submit.prevent="handleSignUp">
-            <div>
+        <form @submit.prevent="handleSignUp" class="signup-form">
+            <div class="form-group">
                 <input
                     type="text"
                     v-model="username"
@@ -10,7 +10,7 @@
                     required
                 />
             </div>
-            <div>
+            <div class="form-group">
                 <input
                     type="password"
                     v-model="password"
@@ -18,7 +18,7 @@
                     required
                 />
             </div>
-            <div>
+            <div class="form-group">
                 <input
                     type="password"
                     v-model="confirmPassword"
@@ -54,10 +54,9 @@ export default {
     methods: {
         ...mapActions(['signUp']),
         async handleSignUp() {
-            // Limpa o estado de erro antes de iniciar o cadastro
             this.$store.commit('setErrorMessage', null);
+            this.$store.commit('setSuccessMessage', null);
 
-            // Verifica se as senhas correspondem
             if (this.password !== this.confirmPassword) {
                 this.$store.commit('setErrorMessage', 'As senhas não coincidem.');
                 return;
@@ -73,11 +72,16 @@ export default {
                 this.$store.commit('setSuccessMessage', 'Cadastro realizado com sucesso!');
                 setTimeout(() => {
                     this.$router.push('/login');
-                }, 5000);
+                }, 3000);
             } catch (error) {
-                // A mensagem de erro já é gerenciada pelo Vuex
+                console.error('Erro durante o cadastro:', error);
             }
         },
+    },
+    created() {
+        // Limpa as mensagens de erro e sucesso ao carregar a página de cadastro
+        this.$store.commit('setErrorMessage', null);
+        this.$store.commit('setSuccessMessage', null);
     },
 };
 </script>
@@ -88,25 +92,48 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 50px;
+    height: calc(100vh - 100px);
+    text-align: center;
 }
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form {
+    margin-bottom: 10px;
+}
+
 input {
-    display: block;
+    width: 100%;
     margin-bottom: 10px;
     padding: 8px;
-    width: 200px;
+    box-sizing: border-box;
 }
+
 button {
-    margin-top: 10px;
-    padding: 10px 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 5px 10px;
     cursor: pointer;
+    font-size: 12px;
 }
+
 .error {
-    color: red;
-    margin-top: 10px;
+    color: rgb(196, 5, 5);
+    margin-top: 5px;
 }
+
 .success {
-    color: green;
-    margin-top: 10px;
+    color: rgba(0, 103, 247, 0.845);
+    margin-top: 5px;
 }
 </style>

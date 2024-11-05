@@ -35,23 +35,35 @@ api.interceptors.response.use(
         const originalRequest = error.config;
         const { response } = error;
 
-        // Verifica se houve erro de autorização (401) e tenta renovar o token
+        // Verifica se houve erro de autorização (401) no endpoint de renovação de token
+        if (response?.status === 401 && originalRequest.url.includes('/auth/token/refresh/')) {
+            console.warn('[Axios] Falha na renovação do token, realizando logout.');
+            await store.dispatch('logout');  // Executa o logout para limpar os dados de autenticação
+            router.push('/login');     // Redireciona o usuário para a página de login
+            return Promise.reject(error);
+        }
+
+        // Verifica se o erro é 401 e tenta renovar o token se ainda não foi tentado
         if (response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
+            originalRequest._retry = true;  // Marca a requisição para evitar loops
             try {
                 console.log('[Axios] Tentando renovar o token de acesso...');
-                await store.dispatch('refreshToken');
+                await store.dispatch('refreshToken');  // Chama a ação `refreshToken` para renovar o token
                 console.log('[Axios] Token renovado com sucesso.');
-                return api(originalRequest); // Reenvia a requisição original após a renovação do token
+                
+                // Atualiza o cabeçalho da requisição original com o novo token
+                originalRequest.headers['Authorization'] = `Bearer ${store.state.token}`;
+                
+                return api(originalRequest); // Reenvia a requisição original com o token atualizado
             } catch (refreshError) {
                 console.error('[Axios] Erro ao renovar o token:', refreshError);
-                store.dispatch('logout');  // Realiza logout seguro
-                router.push('/login');
+                await store.dispatch('logout');  // Executa o logout para limpar os dados de autenticação
+                router.push('/login');     // Redireciona o usuário para a página de login
                 return Promise.reject(refreshError);
             }
         }
 
-        // Define mensagem de erro no estado Vuex e retorna erro
+        // Define mensagem de erro no estado Vuex se houver erro de autenticação e retorna erro
         const errorMsg = response?.data?.detail || 'Erro de autenticação.';
         store.commit('setErrorMessage', errorMsg);
         console.error('[Axios] Erro na resposta:', errorMsg);

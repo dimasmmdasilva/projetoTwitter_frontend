@@ -3,12 +3,9 @@
         <h3>{{ tweet.author.username }}</h3>
         <p>{{ tweet.content }}</p>
         <small>{{ formatDate(tweet.created_at) }}</small>
-
-        <!-- Botão de Exclusão -->
         <div class="tweet-actions">
-            <!-- Mostrar botão de exclusão apenas se o autor for o usuário autenticado -->
             <button v-if="isAuthor" @click="deleteTweet" class="delete-btn">
-                Delete
+                Deletar
             </button>
         </div>
     </div>

@@ -8,13 +8,13 @@ const store = createStore({
         user: JSON.parse(localStorage.getItem('user')) || null,
         isAuthenticated: !!localStorage.getItem('accessToken'),
         tweets: [],
+        users: [],
         isLoading: false,
         errorMessage: null,
         successMessage: null,
     },
     mutations: {
         setToken(state, token) {
-            console.log('[Mutação] Armazenando token de acesso:', token);
             state.token = token;
             state.isAuthenticated = !!token;
             if (token) {
@@ -26,7 +26,6 @@ const store = createStore({
             }
         },
         setRefreshToken(state, refreshToken) {
-            console.log('[Mutação] Armazenando token de atualização:', refreshToken);
             state.refreshToken = refreshToken;
             if (refreshToken) {
                 localStorage.setItem('refreshToken', refreshToken);
@@ -35,7 +34,6 @@ const store = createStore({
             }
         },
         setUser(state, user) {
-            console.log('[Mutação] Armazenando dados do usuário:', user);
             state.user = user;
             if (user) {
                 localStorage.setItem('user', JSON.stringify(user));
@@ -43,16 +41,7 @@ const store = createStore({
                 localStorage.removeItem('user');
             }
         },
-        setTweets(state, tweets) {
-            console.log('[Mutação] Armazenando tweets:', tweets);
-            state.tweets = tweets;
-        },
-        addTweet(state, tweet) {
-            console.log('[Mutação] Adicionando novo tweet:', tweet);
-            state.tweets.unshift(tweet);
-        },
         clearAuth(state) {
-            console.log('[Mutação] Limpando autenticação.');
             state.token = null;
             state.refreshToken = null;
             state.isAuthenticated = false;
@@ -61,17 +50,45 @@ const store = createStore({
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user');
         },
+        setTweets(state, tweets) {
+            state.tweets = tweets;
+        },
+        addTweet(state, tweet) {
+            state.tweets.unshift(tweet);
+        },
+        setUsers(state, users) {
+            state.users = users;
+        },
+        updateUserFollowingStatus(state, userId) {
+            const user = state.users.find((user) => user.id === userId);
+            if (user) {
+                user.is_following = true;
+            }
+        },
         setLoading(state, isLoading) {
-            console.log(`[Mutação] Alterando estado de carregamento para: ${isLoading}`);
             state.isLoading = isLoading;
         },
         setErrorMessage(state, message) {
-            console.log('[Mutação] Definindo mensagem de erro:', message);
             state.errorMessage = message;
         },
         setSuccessMessage(state, message) {
-            console.log('[Mutação] Definindo mensagem de sucesso:', message);
             state.successMessage = message;
+        },
+        clearMessages(state) {
+            state.errorMessage = null;
+            state.successMessage = null;
+        },
+        updateUserBio(state, bio) {
+            if (state.user) {
+                state.user.bio = bio;
+                localStorage.setItem('user', JSON.stringify(state.user));
+            }
+        },
+        updateUserProfileImage(state, profileImageUrl) {
+            if (state.user) {
+                state.user.profile_image_url = profileImageUrl;
+                localStorage.setItem('user', JSON.stringify(state.user));
+            }
         },
     },
     actions: {
@@ -80,100 +97,147 @@ const store = createStore({
             const refreshToken = localStorage.getItem('refreshToken');
             const user = JSON.parse(localStorage.getItem('user'));
 
-            console.log('[Ação] Inicializando store com tokens e usuário armazenado.');
             if (accessToken) commit('setToken', accessToken);
             if (refreshToken) commit('setRefreshToken', refreshToken);
             if (user) commit('setUser', user);
         },
         async signUp({ commit }, userData) {
             commit('setLoading', true);
-            commit('setErrorMessage', null);
+            commit('clearMessages');
 
             try {
                 await api.post('/users/', userData);
                 commit('setSuccessMessage', 'Cadastro realizado com sucesso!');
             } catch (error) {
                 const errorMsg = error.response?.data?.detail || 'Erro ao criar conta.';
-                console.error('[Erro durante o cadastro]:', errorMsg);
                 commit('setErrorMessage', errorMsg);
             } finally {
                 commit('setLoading', false);
             }
         },
-        async login({ commit, dispatch }, credentials) {
+        async login({ commit }, credentials) {
             commit('setLoading', true);
-            commit('setErrorMessage', null);
-
-            console.log('[Ação] Tentando login com credenciais:', credentials);
+            commit('clearMessages');
 
             try {
-                const response = await api.post('/token/', credentials);
-                const { access, refresh } = response.data;
-
-                if (!access || !refresh) {
-                    console.error('[Erro] Resposta de token inválida:', response.data);
-                    throw new Error('Resposta de token inválida.');
-                }
+                const response = await api.post('/auth/login/', credentials);
+                const { access, refresh, user } = response.data;
 
                 commit('setToken', access);
                 commit('setRefreshToken', refresh);
-
-                await dispatch('fetchUserProfile');
-
+                commit('setUser', user);
                 commit('setSuccessMessage', 'Login realizado com sucesso!');
-                console.log('[Ação] Login realizado com sucesso.');
             } catch (error) {
                 const errorMsg = error.response?.data?.detail || 'Credenciais inválidas ou erro no servidor.';
-                console.error('[Erro durante o login]:', errorMsg);
                 commit('setErrorMessage', errorMsg);
             } finally {
                 commit('setLoading', false);
             }
         },
-        async fetchUserProfile({ commit }) {
+        async fetchUserProfile({ commit, state }) {
+            if (!state.isAuthenticated) return;
+
             commit('setLoading', true);
-            console.log('[Ação] Buscando dados do perfil do usuário autenticado.');
+            commit('clearMessages');
 
             try {
                 const response = await api.get('/users/me/');
-                if (response?.data) {
-                    commit('setUser', response.data);
-                } else {
-                    console.error('[Erro] Resposta inválida ao obter perfil do usuário.');
-                    throw new Error('Resposta inválida do servidor.');
-                }
+                commit('setUser', response.data);
             } catch (error) {
-                console.error('[Erro ao obter perfil do usuário]:', error);
                 commit('setErrorMessage', 'Erro ao obter dados do usuário.');
                 commit('clearAuth');
             } finally {
                 commit('setLoading', false);
             }
         },
-        async fetchTweets({ commit }) {
+        async loadUsers({ commit }) {
             commit('setLoading', true);
-            console.log('[Ação] Carregando tweets do servidor.');
+            commit('clearMessages');
+
+            try {
+                const response = await api.get('/users/');
+                commit('setUsers', response.data);
+            } catch (error) {
+                commit('setErrorMessage', 'Erro ao carregar a lista de usuários.');
+                console.error('Erro ao carregar usuários:', error);
+            } finally {
+                commit('setLoading', false);
+            }
+        },
+        async followUser({ commit }, userId) {
+            try {
+                const response = await api.post(`/follow/${userId}/follow_user/`);
+                if (response.status === 200) {
+                    commit('updateUserFollowingStatus', userId);
+                    commit('setSuccessMessage', response.data.detail);
+                }
+            } catch (error) {
+                commit('setErrorMessage', 'Erro ao seguir o usuário.');
+            }
+        },
+        async updateBio({ commit, state }, bioData) {
+            if (!state.isAuthenticated) return;
+
+            commit('setLoading', true);
+            commit('clearMessages');
+
+            try {
+                await api.patch('/users/update_bio/', bioData);
+                commit('updateUserBio', bioData.bio);
+                commit('setSuccessMessage', 'Biografia atualizada com sucesso!');
+            } catch (error) {
+                commit('setErrorMessage', 'Erro ao atualizar biografia.');
+            } finally {
+                commit('setLoading', false);
+            }
+        },
+        async updateProfileImage({ commit, state }, formData) {
+            if (!state.isAuthenticated) return;
+
+            commit('setLoading', true);
+            commit('clearMessages');
+
+            try {
+                const response = await api.patch('/users/update_profile_image/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                const profileImageUrl = response.data.profile_image_url;
+                commit('updateUserProfileImage', profileImageUrl);
+                commit('setSuccessMessage', 'Imagem de perfil atualizada com sucesso!');
+            } catch (error) {
+                commit('setErrorMessage', 'Erro ao atualizar a imagem de perfil.');
+            } finally {
+                commit('setLoading', false);
+            }
+        },
+        async fetchTweets({ commit, state }) {
+            if (!state.isAuthenticated) return;
+
+            commit('setLoading', true);
+            commit('clearMessages');
 
             try {
                 const response = await api.get('/tweets/');
                 commit('setTweets', response.data);
             } catch (error) {
-                console.error('[Erro ao carregar tweets]:', error);
                 commit('setErrorMessage', 'Erro ao carregar tweets.');
             } finally {
                 commit('setLoading', false);
             }
         },
-        async createTweet({ commit }, tweetData) {
+        async createTweet({ commit, state }, tweetData) {
+            if (!state.isAuthenticated) return;
+
             commit('setLoading', true);
-            console.log('[Ação] Criando novo tweet:', tweetData);
+            commit('clearMessages');
 
             try {
                 const response = await api.post('/tweets/', tweetData);
                 commit('addTweet', response.data);
                 commit('setSuccessMessage', 'Tweet criado com sucesso!');
             } catch (error) {
-                console.error('[Erro ao criar tweet]:', error);
                 commit('setErrorMessage', 'Erro ao criar tweet.');
             } finally {
                 commit('setLoading', false);
@@ -186,16 +250,14 @@ const store = createStore({
             }
 
             try {
-                const response = await api.post('/token/refresh/', { refresh: state.refreshToken });
+                const response = await api.post('/auth/token/refresh/', { refresh: state.refreshToken });
                 commit('setToken', response.data.access);
             } catch (error) {
-                console.error('[Erro ao renovar o token]:', error);
                 commit('setErrorMessage', 'Erro ao atualizar token.');
                 commit('clearAuth');
             }
         },
         logout({ commit }) {
-            console.log('[Ação] Realizando logout.');
             commit('clearAuth');
             commit('setSuccessMessage', 'Logout realizado com sucesso!');
         },
@@ -207,6 +269,7 @@ const store = createStore({
         successMessage: (state) => state.successMessage,
         getUser: (state) => state.user,
         getTweets: (state) => state.tweets,
+        getUsers: (state) => state.users,
     },
 });
 

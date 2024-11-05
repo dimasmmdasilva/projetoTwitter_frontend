@@ -1,12 +1,12 @@
 <template>
     <div class="user-list">
         <h3>Usuários Sugeridos</h3>
-        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-        <div v-else-if="!users || users.length === 0" class="no-users">
+        <div v-if="localErrorMessage" class="error">{{ localErrorMessage }}</div>
+        <div v-else-if="!filteredUsers || filteredUsers.length === 0" class="no-users">
             Não existem usuários.
         </div>
-        <div v-else>
-            <div v-for="user in users" :key="user.id" class="user-item">
+        <div v-else class="user-container">
+            <div v-for="user in filteredUsers" :key="user.id" class="user-item">
                 <img :src="user.profile_image_url" alt="Profile" class="user-img" />
                 <div>
                     <p>{{ user.username }}</p>
@@ -23,23 +23,32 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 
 export default {
     name: 'UserList',
+    data() {
+        return {
+            localErrorMessage: null, // Mensagem de erro local
+        };
+    },
     computed: {
         ...mapState({
-            users: (state) => state.users, // Lista de usuários carregada no Vuex
             isLoading: (state) => state.isLoading, // Estado de carregamento
-            errorMessage: (state) => state.errorMessage, // Mensagens de erro
         }),
+        ...mapGetters(['getUsers', 'getUser']), // Usa os getters para obter usuários e usuário logado
+
+        filteredUsers() {
+            // Filtra os usuários, excluindo o próprio usuário logado
+            return this.getUsers.filter(user => user.id !== this.getUser.id);
+        },
     },
     async mounted() {
         try {
             await this.loadUsers(); // Carrega a lista de usuários ao montar o componente
         } catch (error) {
             console.error('Erro ao carregar usuários:', error);
-            this.$store.commit('setErrorMessage', 'Erro ao carregar a lista de usuários.');
+            this.localErrorMessage = 'Erro ao carregar a lista de usuários.';
         }
     },
     methods: {
@@ -47,11 +56,11 @@ export default {
 
         async handleFollow(userId) {
             try {
-                await this.followUser(userId); // Chamada Vuex para seguir o usuário
+                await this.followUser(userId); // Chama Vuex para seguir o usuário
                 await this.loadUsers(); // Atualiza a lista de usuários após seguir
             } catch (error) {
                 console.error('Erro ao seguir usuário:', error);
-                this.$store.commit('setErrorMessage', 'Não foi possível seguir o usuário.');
+                this.localErrorMessage = 'Não foi possível seguir o usuário.';
             }
         },
     },
@@ -65,16 +74,24 @@ export default {
     padding: 20px;
     border-radius: 8px;
 }
+.user-container {
+    display: flex; /* Disposição horizontal */
+    flex-wrap: wrap; /* Permite que os usuários quebrem para a próxima linha */
+    gap: 15px; /* Espaçamento entre os usuários */
+}
 .user-item {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    width: 150px; /* Define uma largura para os itens de usuário */
+    flex-direction: column; /* Disposição dos itens dentro de user-item em coluna */
+    text-align: center;
 }
 .user-img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-bottom: 5px;
     object-fit: cover;
 }
 .error {

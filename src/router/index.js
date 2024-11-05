@@ -4,7 +4,6 @@ import LoginForm from '../views/loginForm.vue';
 import SignUpForm from '../views/signUpForm.vue';
 import UserDashboard from '../views/userDashboard.vue';
 
-// Definindo as rotas
 const routes = [
     {
         path: '/',
@@ -14,11 +13,13 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: LoginForm,
+        meta: { guest: true },
     },
     {
         path: '/register',
         name: 'Register',
         component: SignUpForm,
+        meta: { guest: true },
     },
     {
         path: '/dashboard',
@@ -38,19 +39,30 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const isAuthenticated = store.getters.isAuthenticated;
 
-    // Verifica se a rota exige autenticação e se o usuário está autenticado
-    if (to.meta.requiresAuth && !isAuthenticated) {
-        try {
-            await store.dispatch('refreshToken');  // Tenta renovar o token de acesso
-            next();  // Permite a navegação após renovação
-        } catch (error) {
-            next('/login');  // Redireciona para login se a renovação falhar
+    // Se a rota exige autenticação
+    if (to.meta.requiresAuth) {
+        if (isAuthenticated) {
+            next(); // Usuário já autenticado, permite o acesso
+        } else {
+            try {
+                // Tenta renovar o token de acesso
+                console.log('[Router] Tentando renovar o token de acesso...');
+                await store.dispatch('refreshToken');
+                next(); // Permite a navegação após renovação do token
+            } catch (error) {
+                console.warn('[Router] Falha na renovação do token, redirecionando para login.');
+                store.dispatch('logout'); // Limpa o estado de autenticação no Vuex
+                next('/login'); // Redireciona para a página de login se a renovação falhar
+            }
         }
-    } else if ((to.name === 'Login' || to.name === 'Register') && isAuthenticated) {
-        // Redireciona para o dashboard se já estiver autenticado
-        next('/dashboard');
-    } else {
-        next();  // Prossegue para a rota desejada
+    } 
+    // Se a rota é para visitantes e o usuário está autenticado
+    else if (to.meta.guest && isAuthenticated) {
+        next('/dashboard'); // Redireciona usuários autenticados para o dashboard
+    } 
+    // Caso contrário, permite o acesso à rota
+    else {
+        next();
     }
 });
 
