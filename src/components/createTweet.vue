@@ -1,75 +1,84 @@
 <template>
     <div class="create-tweet">
+        <!-- Componente de notificação para exibir mensagens de sucesso ou erro -->
+        <notification-alert
+            v-if="notificationMessage"
+            :message="notificationMessage"
+            :type="notificationType"
+            @close="clearNotification"
+        />
+
         <textarea
             v-model="tweetContent"
-            placeholder="What's happening?"
+            placeholder="escreva suas ideias..."
             maxlength="280"
             rows="3"
         ></textarea>
         <button
-            @click="postTweet"
+            @click="handleCreateTweet"
             :disabled="isLoading || !tweetContent.trim()"
         >
-            {{ isLoading ? 'Enviando...' : 'Tweet' }}
+            {{ isPosting ? 'Enviando...' : isLoading ? 'Aguarde...' : 'Tweet' }}
         </button>
-        <p v-if="successMessage" class="success">{{ successMessage }}</p>
-        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapMutations } from 'vuex';
+import NotificationAlert from '@/components/notificationAlert.vue';
 
 export default {
     name: 'CreateTweet',
+    components: {
+        NotificationAlert,
+    },
     data() {
         return {
             tweetContent: '', // Armazena o conteúdo do novo tweet
+            isPosting: false, // Controle para mostrar a mensagem "Enviando..."
         };
     },
     computed: {
         ...mapState({
             isLoading: (state) => state.isLoading, // Controle de carregamento do Vuex
-            errorMessage: (state) => state.errorMessage, // Mensagem de erro do Vuex
-            successMessage: (state) => state.successMessage, // Mensagem de sucesso do Vuex
+            notificationMessage: (state) => state.notificationMessage, // Mensagem de notificação do Vuex
+            notificationType: (state) => state.notificationType, // Tipo de notificação do Vuex
         }),
     },
     methods: {
         ...mapActions(['createTweet']),
-        async postTweet() {
+        ...mapMutations(['setNotification', 'clearNotification']),
+
+        async handleCreateTweet() {
+            this.clearNotification(); // Limpa notificações anteriores
+
             if (!this.tweetContent.trim()) {
                 // Impede o envio se o conteúdo estiver vazio
-                this.$store.commit('setErrorMessage', 'Tweet content cannot be empty.');
+                this.setNotification({ message: 'O conteúdo do tweet não pode estar vazio.', type: 'error' });
                 return;
             }
 
+            // Mostra "Enviando..." no botão e espera 3 segundos antes de enviar o tweet
+            this.isPosting = true;
+
+            // Aguardar 3 segundos antes de chamar postTweet
+            setTimeout(() => {
+                this.isPosting = false;
+                this.postTweet(); // Chama o método de postagem após o atraso
+            }, 3000);
+        },
+
+        async postTweet() {
             try {
                 // Chama a action para criar o tweet via Vuex
                 await this.createTweet({ content: this.tweetContent.trim() });
 
                 // Limpa o campo após o envio bem-sucedido
                 this.tweetContent = '';
-                this.$store.commit('setSuccessMessage', 'Tweet posted successfully!');
+                this.setNotification({ message: 'Tweet postado com sucesso!', type: 'success' });
             } catch (error) {
-                // Mensagem de erro já é gerenciada pelo Vuex
-                console.error('Error posting tweet:', error);
-            }
-        },
-    },
-    watch: {
-        // Limpa as mensagens de sucesso e erro após 3 segundos
-        successMessage(newVal) {
-            if (newVal) {
-                setTimeout(() => {
-                    this.$store.commit('setSuccessMessage', null);
-                }, 3000);
-            }
-        },
-        errorMessage(newVal) {
-            if (newVal) {
-                setTimeout(() => {
-                    this.$store.commit('setErrorMessage', null);
-                }, 3000);
+                this.setNotification({ message: 'Erro ao postar tweet. Tente novamente.', type: 'error' });
+                console.error('Erro ao postar tweet:', error);
             }
         },
     },
@@ -98,13 +107,5 @@ button {
 }
 button:disabled {
     background-color: #aaa;
-}
-.error {
-    color: red;
-    margin-top: 10px;
-}
-.success {
-    color: green;
-    margin-top: 10px;
 }
 </style>

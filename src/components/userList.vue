@@ -1,9 +1,8 @@
 <template>
     <div class="user-list">
-        <h3>Usuários Sugeridos</h3>
-        <div v-if="localErrorMessage" class="error">{{ localErrorMessage }}</div>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
         <div v-else-if="!filteredUsers || filteredUsers.length === 0" class="no-users">
-            Não existem usuários.
+            não existem usuários
         </div>
         <div v-else class="user-container">
             <div v-for="user in filteredUsers" :key="user.id" class="user-item">
@@ -11,10 +10,13 @@
                 <div>
                     <p>{{ user.username }}</p>
                     <button
-                        @click="handleFollow(user.id)"
-                        :disabled="user.is_following || isLoading"
+                        @click="toggleFollow(user)"
+                        @mouseover="showUnfollowOption(user)"
+                        @mouseleave="hideUnfollowOption(user)"
+                        :class="{ following: user.is_following }"
+                        :disabled="isLoading"
                     >
-                        {{ user.is_following ? 'Seguindo' : 'Seguir' }}
+                        {{ user.is_following ? (user.showUnfollow ? 'Reverter' : 'Seguindo') : 'Seguir' }}
                     </button>
                 </div>
             </div>
@@ -27,41 +29,43 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 
 export default {
     name: 'UserList',
-    data() {
-        return {
-            localErrorMessage: null, // Mensagem de erro local
-        };
-    },
     computed: {
         ...mapState({
-            isLoading: (state) => state.isLoading, // Estado de carregamento
+            isLoading: (state) => state.isLoading,
+            errorMessage: (state) => state.errorMessage,
         }),
-        ...mapGetters(['getUsers', 'getUser']), // Usa os getters para obter usuários e usuário logado
+        ...mapGetters(['getUsers', 'getUser']),
 
         filteredUsers() {
-            // Filtra os usuários, excluindo o próprio usuário logado
             return this.getUsers.filter(user => user.id !== this.getUser.id);
         },
     },
     async mounted() {
         try {
-            await this.loadUsers(); // Carrega a lista de usuários ao montar o componente
+            await this.loadUsers();
         } catch (error) {
             console.error('Erro ao carregar usuários:', error);
-            this.localErrorMessage = 'Erro ao carregar a lista de usuários.';
+            this.$store.commit('setErrorMessage', 'Erro ao carregar a lista de usuários.');
         }
     },
     methods: {
-        ...mapActions(['loadUsers', 'followUser']), // Ações Vuex para carregar usuários e seguir
+        ...mapActions(['loadUsers', 'followUser', 'unfollowUser']),
 
-        async handleFollow(userId) {
-            try {
-                await this.followUser(userId); // Chama Vuex para seguir o usuário
-                await this.loadUsers(); // Atualiza a lista de usuários após seguir
-            } catch (error) {
-                console.error('Erro ao seguir usuário:', error);
-                this.localErrorMessage = 'Não foi possível seguir o usuário.';
+        async toggleFollow(user) {
+            if (user.is_following) {
+                await this.unfollowUser(user.id);
+            } else {
+                await this.followUser(user.id);
             }
+            await this.loadUsers();
+        },
+        showUnfollowOption(user) {
+            if (user.is_following) {
+                user.showUnfollow = true;
+            }
+        },
+        hideUnfollowOption(user) {
+            user.showUnfollow = false;
         },
     },
 };
@@ -75,16 +79,16 @@ export default {
     border-radius: 8px;
 }
 .user-container {
-    display: flex; /* Disposição horizontal */
-    flex-wrap: wrap; /* Permite que os usuários quebrem para a próxima linha */
-    gap: 15px; /* Espaçamento entre os usuários */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 .user-item {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-    width: 150px; /* Define uma largura para os itens de usuário */
-    flex-direction: column; /* Disposição dos itens dentro de user-item em coluna */
+    width: 150px;
+    flex-direction: column;
     text-align: center;
 }
 .user-img {
@@ -104,8 +108,34 @@ export default {
     font-weight: bold;
     margin-bottom: 20px;
 }
+button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(232, 232, 232);
+    cursor: pointer;
+    font-size: 8px;
+    padding: 5px 0;
+    width: 40px;
+    height: 20px;
+    border: 1px solid #000;
+}
+
+button.following {
+    background-color: rgb(86, 156, 255);
+}
+
+button.following:hover {
+    background-color: rgb(255, 90, 90);
+}
+
+button.unfollow {
+    background-color: rgb(255, 103, 103);
+}
+
 button:disabled {
-    background-color: grey;
+    background-color: rgb(229, 255, 113);
     cursor: not-allowed;
 }
+
 </style>

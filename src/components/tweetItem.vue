@@ -1,13 +1,13 @@
 <template>
     <div class="tweet-item">
-        <h3>{{ tweet.author.username }}</h3>
-        <p>{{ tweet.content }}</p>
-        <small>{{ formatDate(tweet.created_at) }}</small>
-        <div class="tweet-actions">
-            <button v-if="isAuthor" @click="deleteTweet" class="delete-btn">
-                Deletar
+        <div class="tweet-header">
+            <h3>{{ tweet.author }}</h3> <!-- Exibe o nome do autor diretamente -->
+            <small>{{ formatDate(tweet.created_at) }}</small> <!-- Exibe a data formatada -->
+            <button v-if="isAuthor" @click="handleDeleteTweet" class="delete-btn" title="Deletar Tweet">
+                🗑️ 
             </button>
         </div>
+        <p>{{ tweet.content }}</p>
     </div>
 </template>
 
@@ -19,28 +19,28 @@ export default {
     computed: {
         ...mapGetters(['getUser']),
         isAuthor() {
-            // Verifica se o usuário autenticado é o autor do tweet
-            return this.tweet.author.username === this.getUser.username;
+            return this.tweet.author === this.getUser.username;
         },
     },
     methods: {
         ...mapActions(['deleteTweet']),
         formatDate(date) {
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            };
-            return new Date(date).toLocaleDateString(undefined, options);
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        };
+        return new Date(date).toLocaleDateString(undefined, options);
         },
-        async deleteTweet() {
-            // Confirmação antes de deletar o tweet
-            if (confirm('Tem certeza de que deseja excluir este tweet?')) {
+        async handleDeleteTweet() {
+            if (confirm('seu tweet será excluído...')) {
                 try {
-                    await this.deleteTweet(this.tweet.id); // Exclui o tweet via Vuex
-                    this.$emit('tweet-deleted', this.tweet.id); // Emite evento para o componente pai
+                    // Chama a action deleteTweet passando o ID do tweet
+                    await this.deleteTweet({ tweetId: this.tweet.id });
+                    // Emite um evento para informar o componente pai sobre a exclusão
+                    this.$emit('tweet-deleted', this.tweet.id);
                 } catch (error) {
                     console.error('Erro ao excluir o tweet:', error);
                 }
@@ -50,28 +50,30 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .tweet-item {
     border-bottom: 1px solid #ddd;
     padding: 10px 0;
 }
 
-.tweet-actions {
+.tweet-header {
     display: flex;
     align-items: center;
-    margin-top: 5px;
+    justify-content: space-between;
 }
 
 .delete-btn {
-    background-color: red;
-    color: white;
+    background: transparent;
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    font-size: 1rem;
+    color: red;
     cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
 }
 
 .delete-btn:hover {
-    background-color: darkred;
+    color: darkred;
 }
 </style>

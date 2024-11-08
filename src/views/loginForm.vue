@@ -7,16 +7,27 @@
             <button type="submit" :disabled="isLoading">
                 {{ isLoading ? 'Entrando...' : 'Login' }}
             </button>
-            <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </form>
         <p>Não tem uma conta? <router-link to="/register">Cadastre-se aqui</router-link></p>
+
+        <!-- Componente de notificação para exibir mensagens de erro ou sucesso -->
+        <NotificationAlert
+            v-if="notificationMessage"
+            :message="notificationMessage"
+            :type="notificationType"
+            @close="clearNotification"
+        />
     </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapMutations } from 'vuex';
+import NotificationAlert from '@/components/notificationAlert.vue';
 
 export default {
+    components: {
+        NotificationAlert,
+    },
     data() {
         return {
             username: '',
@@ -24,21 +35,40 @@ export default {
         };
     },
     computed: {
-        ...mapState(['isAuthenticated', 'isLoading', 'errorMessage']),
+        ...mapState({
+            isAuthenticated: (state) => state.isAuthenticated,
+            isLoading: (state) => state.isLoading,
+            notificationMessage: (state) => state.notificationMessage,
+            notificationType: (state) => state.notificationType,
+        }),
     },
     methods: {
         ...mapActions(['login']),
+        ...mapMutations(['clearNotification', 'setNotification']),
+
         async handleLogin() {
-            this.$store.commit('setErrorMessage', null);
+            this.clearNotification(); // Limpa notificações anteriores
+
             try {
                 await this.login({ username: this.username, password: this.password });
                 if (this.isAuthenticated) {
+                    this.setNotification({
+                        message: 'Login realizado com sucesso!',
+                        type: 'success',
+                    });
                     this.$router.push('/dashboard');
                 }
             } catch (error) {
-                this.$store.commit('setErrorMessage', 'Credenciais inválidas ou erro no servidor.');
+                this.setNotification({
+                    message: 'Credenciais inválidas ou erro no servidor.',
+                    type: 'error',
+                });
             }
         },
+    },
+    created() {
+        // Limpa notificações ao abrir a página de login
+        this.clearNotification();
     },
 };
 </script>
@@ -74,11 +104,5 @@ button {
     padding: 5px 10px; 
     cursor: pointer;
     font-size: 12px;
-}
-
-.error {
-    color: red;
-    margin-top: 10px;
-    text-align: center;
 }
 </style>

@@ -1,9 +1,16 @@
 <template>
     <div class="tweet-feed">
+        <notification-alert
+            v-if="notificationMessage"
+            :message="notificationMessage"
+            :type="notificationType"
+            @close="clearNotification"
+        />
+
         <div class="create-tweet">
             <textarea
                 v-model="newTweetContent"
-                placeholder="Escreva suas ideias..."
+                placeholder="escreva suas ideias..."
                 rows="3"
             ></textarea>
             <button
@@ -16,19 +23,20 @@
 
         <TweetItem v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
 
-        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         <p v-if="isLoading && tweets.length === 0">Carregando tweets...</p>
     </div>
 </template>
 
 <script>
 import TweetItem from './tweetItem.vue';
-import { mapActions, mapState } from 'vuex';
+import NotificationAlert from '@/components/notificationAlert.vue';
+import { mapActions, mapState, mapMutations } from 'vuex';
 
 export default {
     name: 'TweetFeed',
     components: {
         TweetItem,
+        NotificationAlert,
     },
     data() {
         return {
@@ -39,27 +47,32 @@ export default {
         ...mapState({
             tweets: (state) => state.tweets,
             isLoading: (state) => state.isLoading,
-            errorMessage: (state) => state.errorMessage,
+            notificationMessage: (state) => state.notificationMessage,
+            notificationType: (state) => state.notificationType,
         }),
     },
     async mounted() {
         try {
             await this.fetchTweets();
         } catch (error) {
-            this.$store.commit('setErrorMessage', 'Erro ao carregar tweets.');
+            this.setNotification({ message: 'Erro ao carregar tweets.', type: 'error' });
         }
     },
     methods: {
         ...mapActions(['fetchTweets', 'createTweet']),
+        ...mapMutations(['setNotification', 'clearNotification']),
         
         async handleCreateTweet() {
             if (!this.newTweetContent) return;
 
+            this.clearNotification();
+
             try {
                 await this.createTweet({ content: this.newTweetContent });
                 this.newTweetContent = '';
+                this.setNotification({ message: 'Tweet criado com sucesso!', type: 'success' });
             } catch (error) {
-                this.$store.commit('setErrorMessage', 'Erro ao criar tweet.');
+                this.setNotification({ message: 'Erro ao criar tweet.', type: 'error' });
             }
         },
     },
@@ -98,9 +111,5 @@ button {
 }
 button:disabled {
     background-color: #aaa;
-}
-.error {
-    color: red;
-    margin-top: 10px;
 }
 </style>

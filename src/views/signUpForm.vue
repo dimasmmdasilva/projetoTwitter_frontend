@@ -29,18 +29,28 @@
             <button type="submit" :disabled="isLoading">
                 {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
             </button>
-            <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-            <p v-if="successMessage" class="success">{{ successMessage }}</p>
         </form>
         <router-link to="/login">Já possui uma conta? Login</router-link>
+
+        <!-- Componente de notificação para exibir mensagens de erro ou sucesso -->
+        <NotificationAlert
+            v-if="notificationMessage"
+            :message="notificationMessage"
+            :type="notificationType"
+            @close="clearNotification"
+        />
     </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapMutations } from 'vuex';
+import NotificationAlert from '@/components/notificationAlert.vue';
 
 export default {
     name: 'SignUpForm',
+    components: {
+        NotificationAlert,
+    },
     data() {
         return {
             username: '',
@@ -49,16 +59,24 @@ export default {
         };
     },
     computed: {
-        ...mapState(['isLoading', 'errorMessage', 'successMessage']),
+        ...mapState({
+            isLoading: (state) => state.isLoading,
+            notificationMessage: (state) => state.notificationMessage,
+            notificationType: (state) => state.notificationType,
+        }),
     },
     methods: {
         ...mapActions(['signUp']),
+        ...mapMutations(['clearNotification', 'setNotification']),
+
         async handleSignUp() {
-            this.$store.commit('setErrorMessage', null);
-            this.$store.commit('setSuccessMessage', null);
+            this.clearNotification(); // Limpa notificações anteriores
 
             if (this.password !== this.confirmPassword) {
-                this.$store.commit('setErrorMessage', 'As senhas não coincidem.');
+                this.setNotification({
+                    message: 'As senhas não coincidem.',
+                    type: 'error',
+                });
                 return;
             }
 
@@ -69,19 +87,26 @@ export default {
                     confirm_password: this.confirmPassword,
                 });
 
-                this.$store.commit('setSuccessMessage', 'Cadastro realizado com sucesso!');
+                this.setNotification({
+                    message: 'Cadastro realizado com sucesso!',
+                    type: 'success',
+                });
+
                 setTimeout(() => {
                     this.$router.push('/login');
-                }, 3000);
+                }, 3000); // Redireciona para a página de login após 3 segundos
             } catch (error) {
                 console.error('Erro durante o cadastro:', error);
+                this.setNotification({
+                    message: 'Erro ao realizar o cadastro. Tente novamente.',
+                    type: 'error',
+                });
             }
         },
     },
     created() {
-        // Limpa as mensagens de erro e sucesso ao carregar a página de cadastro
-        this.$store.commit('setErrorMessage', null);
-        this.$store.commit('setSuccessMessage', null);
+        // Limpa mensagens anteriores ao abrir a página de cadastro
+        this.clearNotification();
     },
 };
 </script>
@@ -108,10 +133,6 @@ export default {
     width: 100%;
 }
 
-.form {
-    margin-bottom: 10px;
-}
-
 input {
     width: 100%;
     margin-bottom: 10px;
@@ -125,15 +146,5 @@ button {
     padding: 5px 10px;
     cursor: pointer;
     font-size: 12px;
-}
-
-.error {
-    color: rgb(196, 5, 5);
-    margin-top: 5px;
-}
-
-.success {
-    color: rgba(0, 103, 247, 0.845);
-    margin-top: 5px;
 }
 </style>

@@ -13,19 +13,19 @@ export default {
         },
         type: {
             type: String,
-            default: 'success', // Tipo de notificação (success, error)
+            default: 'success',
         },
     },
     methods: {
         closeNotification() {
-            this.$emit('close'); // Emite um evento para fechar a notificação
+            this.$emit('close');
         },
     },
     watch: {
         message() {
             if (this.message) {
                 setTimeout(() => {
-                    this.closeNotification(); // Fecha a notificação automaticamente após 5 segundos
+                    this.closeNotification();
                 }, 5000);
             }
         },
@@ -47,9 +47,9 @@ export default {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 .notification.success {
-    background-color: #4CAF50;
+    background-color: #65afff;
 }
 .notification.error {
-    background-color: #F44336;
+    background-color: #ff675c;
 }
 </style>

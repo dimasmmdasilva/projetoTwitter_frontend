@@ -1,5 +1,12 @@
 <template>
     <div class="user-profile">
+        <notification-alert
+            v-if="notificationMessage"
+            :message="notificationMessage"
+            :type="notificationType"
+            @close="clearNotification"
+        />
+        
         <div class="profile-img-container" @click="triggerFileUpload">
             <img
                 v-if="user?.profile_image_url"
@@ -18,12 +25,13 @@
                 accept="image/*"
             />
         </div>
+        
         <h2 v-if="user?.username">{{ user.username }}</h2>
         <h2 v-else>Usuário não encontrado</h2>
         <p>{{ user?.followers_count || 0 }} seguidores</p>
 
-        <div>
-            <p v-if="!isEditingBio">{{ user?.bio || 'Escreva sobre você' }}</p>
+        <div class="bio-container">
+            <p v-if="!isEditingBio" class="bio-text">{{ user?.bio || 'Escreva sobre você' }}</p>
             <div v-if="isEditingBio">
                 <textarea v-model="newBio" maxlength="300"></textarea>
                 <div class="buttons">
@@ -32,38 +40,40 @@
                 </div>
             </div>
             <button v-if="!isEditingBio" @click="editBio" :disabled="isSaving">
-                Editar Biografia
+                Biografia
             </button>
         </div>
-
-        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-        <p v-if="successMessage" class="success">{{ successMessage }}</p>
 
         <button class="logout-button" @click="handleLogout">Sair</button>
     </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapMutations } from 'vuex';
+import NotificationAlert from '@/components/notificationAlert.vue';
 
 export default {
+    components: {
+        NotificationAlert,
+    },
     data() {
         return {
             newBio: '',
             isEditingBio: false,
             isSaving: false,
-            errorMessage: null,
-            successMessage: null,
         };
     },
     computed: {
         ...mapState({
             user: (state) => state.user,
+            notificationMessage: (state) => state.notificationMessage,
+            notificationType: (state) => state.notificationType,
         }),
     },
     methods: {
         ...mapActions(['updateProfileImage', 'updateBio', 'fetchUserProfile', 'logout']),
-        
+        ...mapMutations(['setNotification', 'clearNotification']),
+
         triggerFileUpload() {
             this.$refs.fileInput.click();
         },
@@ -73,18 +83,25 @@ export default {
                 const formData = new FormData();
                 formData.append('profile_image', file);
                 this.isSaving = true;
-                this.clearMessages();
+                this.clearNotification();
+
                 try {
                     await this.updateProfileImage(formData);
-                    this.successMessage = 'Imagem de perfil atualizada com sucesso!';
+                    this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
                     await this.fetchUserProfile();
+
+                    if (this.user && this.user.profile_image_url) {
+                        // Força o recarregamento da imagem com o timestamp
+                        this.user.profile_image_url += `?t=${new Date().getTime()}`;
+                    }
                 } catch (error) {
-                    this.errorMessage = 'Erro ao atualizar a imagem. Tente novamente.';
+                    console.error("Erro ao atualizar a imagem de perfil:", error);
+                    this.setNotification({ message: 'Erro ao atualizar a imagem. Tente novamente.', type: 'error' });
                 } finally {
                     this.isSaving = false;
                 }
             } else {
-                this.errorMessage = 'O arquivo deve ser menor que 2MB.';
+                this.setNotification({ message: 'O arquivo deve ser menor que 2MB.', type: 'error' });
             }
         },
         editBio() {
@@ -93,18 +110,19 @@ export default {
         },
         async confirmEditBio() {
             if (this.newBio.length > 300) {
-                this.errorMessage = 'A biografia não pode ter mais de 300 caracteres.';
+                this.setNotification({ message: 'A biografia não pode ter mais de 300 caracteres.', type: 'error' });
                 return;
             }
             this.isSaving = true;
-            this.clearMessages();
+            this.clearNotification();
+
             try {
                 await this.updateBio({ bio: this.newBio });
-                this.successMessage = 'Biografia atualizada com sucesso!';
+                this.setNotification({ message: 'Biografia atualizada com sucesso!', type: 'success' });
                 this.isEditingBio = false;
                 await this.fetchUserProfile();
             } catch (error) {
-                this.errorMessage = 'Erro ao atualizar biografia. Tente novamente.';
+                this.setNotification({ message: 'Erro ao atualizar biografia. Tente novamente.', type: 'error' });
             } finally {
                 this.isSaving = false;
             }
@@ -116,10 +134,6 @@ export default {
         async handleLogout() {
             await this.logout();
             this.$router.push('/login');
-        },
-        clearMessages() {
-            this.errorMessage = null;
-            this.successMessage = null;
         }
     },
     async created() {
@@ -127,12 +141,13 @@ export default {
             try {
                 await this.fetchUserProfile();
             } catch (error) {
-                this.errorMessage = 'Erro ao carregar perfil do usuário. Tente novamente.';
+                this.setNotification({ message: 'Erro ao carregar perfil do usuário. Tente novamente.', type: 'error' });
             }
         }
     }
 };
 </script>
+
 
 <style scoped>
 .user-profile {
@@ -194,18 +209,8 @@ button {
     margin-top: 10px;
     padding: 5px 10px; 
     cursor: pointer;
-    font-size: 12px;
+    font-size: 10px;
     width: 100px;
-}
-
-.error {
-    color: red;
-    margin-top: 10px;
-}
-
-.success {
-    color: green;
-    margin-top: 10px;
 }
 
 .logout-button {
@@ -215,12 +220,11 @@ button {
     color: white;
     margin-bottom: 30px;
     padding: 5px 10px;
-    cursor: pointer;
-    font-size: 12px;
+    font-size: 10px;
     width: 100px;
 }
 
 .logout-button:hover {
-    background-color: #950000;
+    background-color: #cc0000;
 }
 </style>
