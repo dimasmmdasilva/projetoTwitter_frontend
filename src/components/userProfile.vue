@@ -6,11 +6,11 @@
             :type="notificationType"
             @close="clearNotification"
         />
-        
+
         <div class="profile-img-container" @click="triggerFileUpload">
             <img
                 v-if="user?.profile_image_url"
-                :src="computedProfileImageUrl"
+                :src="user.profile_image_url"
                 alt="Profile Image"
                 class="profile-img"
             />
@@ -25,7 +25,7 @@
                 accept="image/*"
             />
         </div>
-        
+
         <h2 v-if="user?.username">{{ user.username }}</h2>
         <h2 v-else>Usuário não encontrado</h2>
         <p>{{ user?.followers_count || 0 }} seguidores</p>
@@ -69,10 +69,6 @@ export default {
             notificationMessage: (state) => state.notificationMessage,
             notificationType: (state) => state.notificationType,
         }),
-        computedProfileImageUrl() {
-            // Força o recarregamento da imagem ao incluir o timestamp
-            return this.user?.profile_image_url ? `${this.user.profile_image_url}?t=${new Date().getTime()}` : null;
-        },
     },
     methods: {
         ...mapActions(['updateProfileImage', 'updateBio', 'fetchUserProfile', 'logout']),
@@ -90,9 +86,16 @@ export default {
                 this.clearNotification();
 
                 try {
-                    await this.updateProfileImage(formData);
-                    this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
-                    await this.fetchUserProfile();
+                    const response = await this.updateProfileImage(formData);
+
+                    // Verifique se a URL da imagem está presente antes de chamar o fetchUserProfile
+                    if (response && response.profile_image_url) {
+                        await this.fetchUserProfile();
+                        this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
+                    } else {
+                        console.error("URL da imagem de perfil não recebida corretamente.");
+                        this.setNotification({ message: 'Erro ao atualizar a imagem de perfil. URL inválida.', type: 'error' });
+                    }
                 } catch (error) {
                     console.error("Erro ao atualizar a imagem de perfil:", error);
                     this.setNotification({ message: 'Erro ao atualizar a imagem. Tente novamente.', type: 'error' });
