@@ -7,19 +7,27 @@ const api = axios.create({
     baseURL: process.env.VUE_APP_API_URL || 'https://projetofinal-back-end.onrender.com/api',
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/json',
         Accept: 'application/json',
     },
 });
 
-// Interceptor de requisição para adicionar o token de autorização
+// Interceptor de requisição para adicionar o token de autorização em todas as requisições
 api.interceptors.request.use(
     (config) => {
         const token = store.state.token;
+        
         if (token) {
             console.log('[Axios] Adicionando token de autorização ao cabeçalho.');
             config.headers['Authorization'] = `Bearer ${token}`;
         }
+
+        // Garante que 'Content-Type' seja configurado automaticamente para `multipart/form-data` se for um FormData
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type']; // Permite que o Axios defina o tipo correto
+        } else {
+            config.headers['Content-Type'] = 'application/json';
+        }
+
         return config;
     },
     (error) => {
