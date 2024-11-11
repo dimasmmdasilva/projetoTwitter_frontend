@@ -86,16 +86,12 @@ export default {
                 this.clearNotification();
 
                 try {
-                    const response = await this.updateProfileImage(formData);
+                    // Chama a action do Vuex para atualizar a imagem de perfil
+                    await this.updateProfileImage(formData);
 
-                    // Verifique se a URL da imagem está presente antes de chamar o fetchUserProfile
-                    if (response && response.profile_image_url) {
-                        await this.fetchUserProfile();
-                        this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
-                    } else {
-                        console.error("URL da imagem de perfil não recebida corretamente.");
-                        this.setNotification({ message: 'Erro ao atualizar a imagem de perfil. URL inválida.', type: 'error' });
-                    }
+                    // Atualiza o perfil do usuário para obter a nova URL da imagem
+                    await this.fetchUserProfile();
+                    this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
                 } catch (error) {
                     console.error("Erro ao atualizar a imagem de perfil:", error);
                     this.setNotification({ message: 'Erro ao atualizar a imagem. Tente novamente.', type: 'error' });

@@ -212,11 +212,14 @@ const store = createStore({
             }
         },
         async updateProfileImage({ commit, state }, formData) {
-            if (!state.isAuthenticated) return;
-            
+            if (!state.isAuthenticated) {
+                commit('setNotification', { message: 'Usuário não autenticado.', type: 'error' });
+                return;
+            }
+        
             commit('setLoading', true);
             commit('clearNotification');
-            
+        
             try {
                 const response = await api.patch('/users/update_profile_image/', formData, {
                     headers: {
@@ -224,19 +227,19 @@ const store = createStore({
                         'Authorization': `Bearer ${state.token}`,
                     },
                 });
-                
+        
+                // Verifica e atualiza a URL da imagem de perfil no estado Vuex
                 const profileImageUrl = response.data.profile_image_url;
                 if (profileImageUrl) {
                     commit('updateUserProfileImage', profileImageUrl);
+                    commit('setNotification', { message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
                 } else {
-                    console.error("URL da imagem de perfil não recebida corretamente.");
-                    commit('setNotification', { message: 'Erro ao atualizar a imagem de perfil. URL inválida.', type: 'error' });
+                    throw new Error('URL da imagem de perfil não recebida corretamente.');
                 }
-        
-                commit('setNotification', { message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
             } catch (error) {
+                const errorMessage = error.response?.data?.detail || 'Erro ao atualizar a imagem de perfil.';
                 console.error("Erro durante o upload da imagem:", error);
-                commit('setNotification', { message: 'Erro ao atualizar a imagem de perfil.', type: 'error' });
+                commit('setNotification', { message: errorMessage, type: 'error' });
             } finally {
                 commit('setLoading', false);
             }
