@@ -10,7 +10,7 @@
         <div class="profile-img-container" @click="triggerFileUpload">
             <img
                 v-if="user?.profile_image_url"
-                :src="user.profile_image_url"
+                :src="computedProfileImageUrl"
                 alt="Profile Image"
                 class="profile-img"
             />
@@ -69,6 +69,10 @@ export default {
             notificationMessage: (state) => state.notificationMessage,
             notificationType: (state) => state.notificationType,
         }),
+        computedProfileImageUrl() {
+            // Força o recarregamento da imagem ao incluir o timestamp
+            return this.user?.profile_image_url ? `${this.user.profile_image_url}?t=${new Date().getTime()}` : null;
+        },
     },
     methods: {
         ...mapActions(['updateProfileImage', 'updateBio', 'fetchUserProfile', 'logout']),
@@ -89,11 +93,6 @@ export default {
                     await this.updateProfileImage(formData);
                     this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
                     await this.fetchUserProfile();
-
-                    if (this.user && this.user.profile_image_url) {
-                        // Força o recarregamento da imagem com o timestamp
-                        this.user.profile_image_url += `?t=${new Date().getTime()}`;
-                    }
                 } catch (error) {
                     console.error("Erro ao atualizar a imagem de perfil:", error);
                     this.setNotification({ message: 'Erro ao atualizar a imagem. Tente novamente.', type: 'error' });
@@ -147,7 +146,6 @@ export default {
     }
 };
 </script>
-
 
 <style scoped>
 .user-profile {

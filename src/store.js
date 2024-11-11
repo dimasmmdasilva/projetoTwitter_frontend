@@ -213,33 +213,32 @@ const store = createStore({
         },
         async updateProfileImage({ commit, state }, formData) {
             if (!state.isAuthenticated) return;
-        
+            
             commit('setLoading', true);
             commit('clearNotification');
-        
+            
             console.log("Iniciando o upload da imagem de perfil...");
-        
+            
             try {
-                // Certifique-se de que o endpoint abaixo esteja correto
                 const response = await api.patch('/users/update_profile_image/', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         'Authorization': `Bearer ${state.token}`,  // Adiciona o token de autenticação
                     },
                 });
-        
+                
                 console.log("Resposta recebida do backend:", response.data);
-        
+                
                 const profileImageUrl = response.data.profile_image_url;
                 if (profileImageUrl) {
-                    const updatedProfileImageUrl = `${profileImageUrl}?t=${new Date().getTime()}`;
-                    commit('updateUserProfileImage', updatedProfileImageUrl);
-                    console.log("URL da imagem de perfil atualizada no estado Vuex:", updatedProfileImageUrl);
+                    // Atualiza o estado do Vuex com a URL da imagem sem o timestamp
+                    commit('updateUserProfileImage', profileImageUrl);
+                    console.log("URL da imagem de perfil atualizada no estado Vuex:", profileImageUrl);
                 } else {
                     console.error("URL da imagem de perfil não recebida corretamente.");
                     commit('setNotification', { message: 'Erro ao atualizar a imagem de perfil. URL inválida.', type: 'error' });
                 }
-        
+                
                 commit('setNotification', { message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
             } catch (error) {
                 console.error("Erro durante o upload da imagem:", error);
@@ -247,7 +246,7 @@ const store = createStore({
             } finally {
                 commit('setLoading', false);
             }
-        },        
+        },
         async fetchTweets({ commit, state }) {
             if (!state.isAuthenticated) return;
 
