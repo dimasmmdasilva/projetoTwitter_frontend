@@ -3,10 +3,10 @@ const path = require('path');
 module.exports = {
     transpileDependencies: true,
     devServer: {
-        port: 8080,
+        port: 8000,
         proxy: {
             '/api': {
-                target: 'https://projetofinal-back-end.onrender.com', // Usa o nome do serviço no Docker
+                target: 'https://projetofinal-back-end.onrender.com',
                 changeOrigin: true,
             },
         },
