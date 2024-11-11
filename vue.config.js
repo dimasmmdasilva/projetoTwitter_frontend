@@ -1,12 +1,12 @@
 const path = require('path');
 
 module.exports = {
-    transpileDependencies: true,
+    transpileDependencies: true, // Transpila automaticamente dependências para compatibilidade
     devServer: {
-        port: 8000,
+        port: 8080,
         proxy: {
             '/api': {
-                target: 'https://projetofinal-back-end.onrender.com',
+                target: 'http://web:8000', // Usa o nome do serviço no Docker
                 changeOrigin: true,
             },
         },

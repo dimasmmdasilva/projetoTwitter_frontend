@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-        <!-- Componente de notificação -->
         <NotificationAlert
             v-if="notificationMessage"
             :message="notificationMessage"
@@ -19,8 +18,6 @@
         <div class="sidebar-right">
             <UserList />
         </div>
-
-        <div v-if="isLoading" class="loading">Carregando...</div>
     </div>
 </template>
 
