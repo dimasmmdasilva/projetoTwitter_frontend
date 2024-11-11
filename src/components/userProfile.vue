@@ -86,11 +86,8 @@ export default {
                 this.clearNotification();
 
                 try {
-                    // Chama a action do Vuex para atualizar a imagem de perfil
                     await this.updateProfileImage(formData);
-
-                    // Atualiza o perfil do usuário para obter a nova URL da imagem
-                    await this.fetchUserProfile();
+                    await this.fetchUserProfile();  // Atualiza o perfil do usuário para exibir a nova imagem
                     this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
                 } catch (error) {
                     console.error("Erro ao atualizar a imagem de perfil:", error);
