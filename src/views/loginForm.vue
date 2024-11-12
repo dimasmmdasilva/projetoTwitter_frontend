@@ -5,7 +5,7 @@
             <input type="text" v-model="username" placeholder="nome do usuário" required />
             <input type="password" v-model="password" placeholder="senha" required />
             <button type="submit" :disabled="isLoading">
-                {{ isLoading ? 'entrando...' : 'entrar' }}
+                {{ isLoading ? 'Entrando...' : 'Entrar' }}
             </button>
         </form>
         <p>não tem uma conta? <router-link to="/register">cadastre-se aqui</router-link></p>

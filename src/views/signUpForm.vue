@@ -30,7 +30,7 @@
                 {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
             </button>
         </form>
-        <router-link to="/login">Já possui uma conta? Login</router-link>
+        <router-link to="/login">já possui uma conta? entre por aqui</router-link>
 
         <!-- Componente de notificação para exibir mensagens de erro ou sucesso -->
         <NotificationAlert
