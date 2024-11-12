@@ -15,7 +15,7 @@
                 class="profile-img"
             />
             <div v-else class="placeholder-img">
-                <span>Adicionar Imagem</span>
+                <span>Imagem</span>
             </div>
             <input
                 type="file"
@@ -150,7 +150,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 95%;
+    height: 100%;
     padding: 20px;
 }
 

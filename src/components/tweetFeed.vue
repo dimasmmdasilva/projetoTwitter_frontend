@@ -17,7 +17,7 @@
                 @click="handleCreateTweet"
                 :disabled="isLoading || !newTweetContent"
             >
-                {{ isLoading ? '...' : 'Postar' }}
+                {{ isLoading ? '...' : 'Tweetar' }}
             </button>
         </div>
 
@@ -81,7 +81,9 @@ export default {
 
 <style scoped>
 .tweet-feed {
-    padding: 20px;
+    height: 100%; /* Ocupa toda a altura disponível dentro do main-content */
+    overflow-y: auto; /* Garante rolagem apenas na área de tweets */
+    padding: 10px;
     background-color: #f5f5f5;
     border-radius: 8px;
 }
