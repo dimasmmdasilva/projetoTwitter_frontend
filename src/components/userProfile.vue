@@ -180,7 +180,7 @@ export default {
     height: 100px;
     border-radius: 80%;
     background-color: #ddd;
-    color: #666;
+    color: #2e69ff;
     font-size: 14px;
     font-weight: bold;
     text-align: center;

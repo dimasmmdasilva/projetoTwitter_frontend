@@ -97,6 +97,7 @@ export default {
     border-radius: 70%;
     margin-bottom: 5px;
     object-fit: cover;
+    background-color: #2e69ff;
 }
 .error {
     color: red;
