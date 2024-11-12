@@ -133,7 +133,7 @@ button:hover {
 }
 
 button.unfollow {
-    background-color: rgb(255, 103, 103);
+    background-color: rgb(144, 190, 255);
 }
 
 button:disabled {
