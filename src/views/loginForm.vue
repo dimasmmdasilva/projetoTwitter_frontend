@@ -2,15 +2,14 @@
     <div class="login-container">
         <h1>Login</h1>
         <form @submit.prevent="handleLogin">
-            <input type="text" v-model="username" placeholder="Nome de usuário" required />
-            <input type="password" v-model="password" placeholder="Senha" required />
+            <input type="text" v-model="username" placeholder="nome do usuário" required />
+            <input type="password" v-model="password" placeholder="senha" required />
             <button type="submit" :disabled="isLoading">
-                {{ isLoading ? 'Entrando...' : 'Login' }}
+                {{ isLoading ? 'entrando...' : 'entrar' }}
             </button>
         </form>
-        <p>Não tem uma conta? <router-link to="/register">Cadastre-se aqui</router-link></p>
+        <p>não tem uma conta? <router-link to="/register">cadastre-se aqui</router-link></p>
 
-        <!-- Componente de notificação para exibir mensagens de erro ou sucesso -->
         <NotificationAlert
             v-if="notificationMessage"
             :message="notificationMessage"

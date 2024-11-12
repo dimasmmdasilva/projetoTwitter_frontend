@@ -81,7 +81,7 @@ export default {
 .container {
     display: flex;
     height: 100vh;
-    overflow: hidden; /* Remover rolagem global */
+    overflow: hidden;
 }
 
 .sidebar-left {
@@ -89,14 +89,14 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     box-sizing: border-box;
-    overflow: hidden; /* Impedir rolagem */
+    overflow: hidden;
 }
 
 .main-content {
     width: 70%;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto; /* Rolagem apenas neste elemento */
+    overflow-y: auto;
     box-sizing: border-box;
 }
 
@@ -105,7 +105,7 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto; /* Rolagem apenas neste elemento */
+    overflow-y: auto;
     box-sizing: border-box;
 }
 

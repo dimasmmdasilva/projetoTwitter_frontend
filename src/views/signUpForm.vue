@@ -6,7 +6,7 @@
                 <input
                     type="text"
                     v-model="username"
-                    placeholder="Nome de usuário"
+                    placeholder="nome do usuário"
                     required
                 />
             </div>
@@ -14,7 +14,7 @@
                 <input
                     type="password"
                     v-model="password"
-                    placeholder="Senha"
+                    placeholder="senha"
                     required
                 />
             </div>
@@ -22,7 +22,7 @@
                 <input
                     type="password"
                     v-model="confirmPassword"
-                    placeholder="Confirmar senha"
+                    placeholder="confirmar senha"
                     required
                 />
             </div>
