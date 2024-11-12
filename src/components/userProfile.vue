@@ -11,11 +11,11 @@
             <img
                 v-if="user?.profile_image_url"
                 :src="user.profile_image_url"
-                alt="Profile Image"
+                alt="imagem"
                 class="profile-img"
             />
             <div v-else class="placeholder-img">
-                <span>Adicionar Imagem</span>
+                <span>imagem</span>
             </div>
             <input
                 type="file"
@@ -27,24 +27,24 @@
         </div>
 
         <h2 v-if="user?.username">{{ user.username }}</h2>
-        <h2 v-else>Usuário não encontrado</h2>
+        <h2 v-else>usuário não encontrado</h2>
         <p>{{ user?.followers_count || 0 }} seguidores</p>
 
         <div class="bio-container">
-            <p v-if="!isEditingBio" class="bio-text">{{ user?.bio || 'Escreva sobre você' }}</p>
+            <p v-if="!isEditingBio" class="bio-text">{{ user?.bio || 'escreva sobre você' }}</p>
             <div v-if="isEditingBio">
                 <textarea v-model="newBio" maxlength="300"></textarea>
                 <div class="buttons">
-                    <button @click="confirmEditBio" :disabled="isSaving">Confirmar</button>
-                    <button @click="cancelEditBio">Cancelar</button>
+                    <button @click="confirmEditBio" :disabled="isSaving">confirmar</button>
+                    <button @click="cancelEditBio">cancelar</button>
                 </div>
             </div>
             <button v-if="!isEditingBio" @click="editBio" :disabled="isSaving">
-                Biografia
+                biografia
             </button>
         </div>
 
-        <button class="logout-button" @click="handleLogout">Sair</button>
+        <button class="logout-button" @click="handleLogout">sair</button>
     </div>
 </template>
 
@@ -162,10 +162,11 @@ export default {
 }
 
 .profile-img {
-    border-radius: 50%;
+    border-radius: 70%;
     width: 100px;
     height: 100px;
     object-fit: cover;
+    background-color: #666;
 }
 
 .hidden {
@@ -208,8 +209,8 @@ button {
 }
 
 .logout-button {
-    margin-top: auto; /* Empurra o botão para o final */
-    margin-bottom: 30px; /* Mantém a distância de 30px do limite inferior */
+    margin-top: auto;
+    margin-bottom: 30px;
     cursor: pointer;
     background-color: #2b2b2b;
     color: white;
