@@ -77,17 +77,17 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     border-radius: 8px;
-    max-height: 100%; /* Para permitir rolagem */
-    overflow-y: auto;
 }
 .user-container {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 15px;
 }
 .user-item {
     display: flex;
     align-items: center;
+    margin-bottom: 10px;
+    width: 150px;
     flex-direction: column;
     text-align: center;
 }
@@ -129,8 +129,13 @@ button.following:hover {
     background-color: rgb(255, 90, 90);
 }
 
+button.unfollow {
+    background-color: rgb(255, 103, 103);
+}
+
 button:disabled {
     background-color: rgb(229, 255, 113);
     cursor: not-allowed;
 }
+
 </style>
