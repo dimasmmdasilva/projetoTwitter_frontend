@@ -81,9 +81,7 @@ export default {
 
 <style scoped>
 .tweet-feed {
-    height: 100%; /* Ocupa toda a altura disponível dentro do main-content */
-    overflow-y: auto; /* Garante rolagem apenas na área de tweets */
-    padding: 10px;
+    padding: 20px;
     background-color: #f5f5f5;
     border-radius: 8px;
 }

@@ -83,30 +83,28 @@ export default {
 <style scoped>
 .container {
     display: flex;
-    height: 100vh; /* Garante que o container ocupe exatamente a altura da viewport */
-    overflow: hidden; /* Remove a rolagem global da página */
+    height: 100%;
+    overflow: hidden !important;
 }
 
 .sidebar-left {
     width: 20%;
-    background-color: #d4d4d4ec;
+    background-color: #f5f5f5;
     padding: 20px;
-    height: 100vh; /* Define altura fixa de 100vh para evitar overflow */
-    overflow: hidden; /* Garante que não haja rolagem na sidebar esquerda */
 }
 
 .main-content {
     width: 70%;
     padding: 20px;
-    height: 100vh; /* Define altura fixa de 100vh para evitar overflow */
-    overflow-y: auto; /* Permite rolagem interna somente para a lista de tweets */
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .sidebar-right {
     width: 10%;
-    background-color: #d4d4d4ec;
+    background-color: #f5f5f5;
     padding: 20px;
-    height: 100vh; /* Define altura fixa de 100vh para evitar overflow */
-    overflow-y: auto; /* Permite rolagem interna somente para a lista de usuários */
+    height: 100vh;
+    overflow-y: auto;
 }
 </style>
