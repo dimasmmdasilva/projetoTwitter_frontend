@@ -7,14 +7,17 @@
             @close="clearNotification"
         />
 
+        <!-- UserProfile fixo do lado esquerdo -->
         <div class="sidebar-left" v-if="user">
             <UserProfile :userProfile="user" />
         </div>
-        
+
+        <!-- TweetFeed com rolagem interna -->
         <div class="main-content">
             <TweetFeed />
         </div>
         
+        <!-- UserList com rolagem interna -->
         <div class="sidebar-right">
             <UserList />
         </div>
@@ -46,7 +49,6 @@ export default {
         }),
     },
     watch: {
-        // Observa mudanças em `isAuthenticated` para carregar dados apenas após autenticação
         isAuthenticated(isAuth) {
             if (isAuth) {
                 this.loadUserProfile();
@@ -82,23 +84,27 @@ export default {
 .container {
     display: flex;
     height: 100vh;
+    overflow: hidden; /* Remove a rolagem global */
 }
+
 .sidebar-left {
     width: 20%;
     background-color: #f5f5f5;
     padding: 20px;
 }
+
+.main-content {
+    width: 60%;
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto; /* Rolagem interna apenas para tweets */
+}
+
 .sidebar-right {
-    width: 10%;
+    width: 20%;
     background-color: #f5f5f5;
     padding: 20px;
-}
-.main-content {
-    width: 70%;
-    padding: 20px;
-}
-.loading {
-    text-align: center;
-    margin-top: 20px;
+    height: 100vh;
+    overflow-y: auto; /* Rolagem interna apenas para lista de usuários */
 }
 </style>
