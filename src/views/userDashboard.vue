@@ -96,6 +96,7 @@ export default {
     width: 70%;
     padding: 20px;
     height: 100vh;
+    overflow-y: auto; /* Rolagem apenas neste elemento */
     box-sizing: border-box;
 }
 
@@ -104,6 +105,7 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
+    overflow-y: auto; /* Rolagem apenas neste elemento */
     box-sizing: border-box;
 }
 

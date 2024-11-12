@@ -152,7 +152,6 @@ export default {
     height: 100%;
     padding: 20px;
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 .profile-img-container {
