@@ -83,7 +83,7 @@ export default {
 <style scoped>
 .container {
     display: flex;
-    height: 100%;
+    height: auto;
     overflow: hidden !important;
 }
 
@@ -97,7 +97,7 @@ export default {
     width: 70%;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto;
+    overflow-y: auto; /* Rolagem interna apenas para tweets */
 }
 
 .sidebar-right {
@@ -105,6 +105,6 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto;
+    overflow-y: auto; /* Rolagem interna apenas para lista de usuários */
 }
 </style>

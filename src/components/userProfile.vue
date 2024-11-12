@@ -15,7 +15,7 @@
                 class="profile-img"
             />
             <div v-else class="placeholder-img">
-                <span>Imagem</span>
+                <span>Adicionar Imagem</span>
             </div>
             <input
                 type="file"
@@ -178,9 +178,9 @@ export default {
     align-items: center;
     width: 100px;
     height: 100px;
-    border-radius: 80%;
+    border-radius: 50%;
     background-color: #ddd;
-    color: #2e69ff;
+    color: #666;
     font-size: 14px;
     font-weight: bold;
     text-align: center;
