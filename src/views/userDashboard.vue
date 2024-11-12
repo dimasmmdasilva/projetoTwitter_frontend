@@ -96,6 +96,7 @@ export default {
     padding: 20px;
     height: 100vh;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .sidebar-right {

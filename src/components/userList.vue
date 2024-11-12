@@ -77,6 +77,7 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     border-radius: 8px;
+    min-height: 100%;
 }
 .user-container {
     display: flex;
