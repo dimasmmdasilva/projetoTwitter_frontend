@@ -124,11 +124,15 @@ button {
     border: 1px solid #000;
 }
 
+button:hover {
+    background-color: rgb(171, 171, 171);
+}
+
 button.following {
     background-color: rgb(86, 156, 255);
 }
 
-button:hover {
+button.unfollow {
     background-color: rgb(255, 103, 103);
 }
 
