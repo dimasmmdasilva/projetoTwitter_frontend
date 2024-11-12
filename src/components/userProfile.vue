@@ -159,7 +159,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 10px;
 }
 
 .profile-img {
@@ -167,6 +166,10 @@ export default {
     width: 100px;
     height: 100px;
     object-fit: cover;
+}
+
+.hidden {
+    display: none;
 }
 
 .placeholder-img {
@@ -183,13 +186,25 @@ export default {
     text-align: center;
 }
 
-.bio-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+textarea {
     width: 100%;
-    margin-top: 20px;
+    height: 100px;
+    margin-top: 10px;
+    resize: none;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 5px 10px; 
+    cursor: pointer;
+    font-size: 10px;
+    width: 100px;
 }
 
 .logout-button {
