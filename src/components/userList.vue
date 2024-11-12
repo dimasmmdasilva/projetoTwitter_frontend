@@ -128,8 +128,8 @@ button.following {
     background-color: rgb(86, 156, 255);
 }
 
-button.following:hover {
-    background-color: rgb(255, 103, 103);
+button:hover {
+    background-color: rgb(184, 184, 184);
 }
 
 button.unfollow {
