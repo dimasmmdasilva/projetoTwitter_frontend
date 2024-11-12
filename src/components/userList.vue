@@ -75,14 +75,15 @@ export default {
 .user-list {
     margin-top: 20px;
     background-color: #f5f5f5;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     min-height: 100%;
 }
 .user-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    align-items: center;
+    gap: 10px;
 }
 .user-item {
     display: flex;
@@ -128,7 +129,7 @@ button.following {
 }
 
 button.following:hover {
-    background-color: rgb(255, 90, 90);
+    background-color: rgb(255, 103, 103);
 }
 
 button.unfollow {
