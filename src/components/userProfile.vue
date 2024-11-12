@@ -150,8 +150,9 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 100%;
+    height: 100vh; /* Garante que ocupe a altura total da coluna */
     padding: 20px;
+    box-sizing: border-box; /* Garante que padding não adicione overflow */
 }
 
 .profile-img-container {
@@ -159,6 +160,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 10px;
 }
 
 .profile-img {
@@ -166,10 +168,6 @@ export default {
     width: 100px;
     height: 100px;
     object-fit: cover;
-}
-
-.hidden {
-    display: none;
 }
 
 .placeholder-img {
@@ -186,25 +184,13 @@ export default {
     text-align: center;
 }
 
-textarea {
-    width: 100%;
-    height: 100px;
-    margin-top: 10px;
-    resize: none;
-}
-
-.buttons {
+.bio-container {
+    flex-grow: 1;
     display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-button {
-    margin-top: 10px;
-    padding: 5px 10px; 
-    cursor: pointer;
-    font-size: 10px;
-    width: 100px;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 20px;
 }
 
 .logout-button {
@@ -212,10 +198,11 @@ button {
     cursor: pointer;
     background-color: #2b2b2b;
     color: white;
-    margin-bottom: 30px;
+    margin-bottom: 30px; /* Distância de 30px do limite inferior */
     padding: 5px 10px;
     font-size: 10px;
     width: 100px;
+    align-self: center;
 }
 
 .logout-button:hover {

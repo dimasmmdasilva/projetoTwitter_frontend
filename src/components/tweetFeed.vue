@@ -17,7 +17,7 @@
                 @click="handleCreateTweet"
                 :disabled="isLoading || !newTweetContent"
             >
-                {{ isLoading ? '...' : 'Tweetar' }}
+                {{ isLoading ? '...' : 'tweetar' }}
             </button>
         </div>
 
@@ -81,7 +81,7 @@ export default {
 
 <style scoped>
 .tweet-feed {
-    padding: 20px;
+    padding: 10px;
     background-color: #f5f5f5;
     border-radius: 8px;
 }

@@ -7,17 +7,14 @@
             @close="clearNotification"
         />
 
-        <!-- UserProfile fixo do lado esquerdo -->
         <div class="sidebar-left" v-if="user">
             <UserProfile :userProfile="user" />
         </div>
 
-        <!-- TweetFeed com rolagem interna -->
         <div class="main-content">
             <TweetFeed />
         </div>
         
-        <!-- UserList com rolagem interna -->
         <div class="sidebar-right">
             <UserList />
         </div>
@@ -97,7 +94,7 @@ export default {
     width: 70%;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto; /* Rolagem interna apenas para tweets */
+    overflow-y: auto;
 }
 
 .sidebar-right {
@@ -105,6 +102,6 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto; /* Rolagem interna apenas para lista de usuários */
+    overflow-y: auto;
 }
 </style>
