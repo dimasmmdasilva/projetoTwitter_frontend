@@ -152,6 +152,7 @@ export default {
     height: 100%;
     padding: 20px;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .profile-img-container {
@@ -179,9 +180,9 @@ export default {
     align-items: center;
     width: 100px;
     height: 100px;
-    border-radius: 50%;
+    border-radius: 70%;
     background-color: #ddd;
-    color: #666;
+    color: #bababa;
     font-size: 14px;
     font-weight: bold;
     text-align: center;
