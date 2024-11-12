@@ -88,6 +88,7 @@ export default {
     width: 20%;
     background-color: #f5f5f5;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .main-content {
@@ -95,6 +96,7 @@ export default {
     padding: 20px;
     height: 100vh;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .sidebar-right {
@@ -103,5 +105,6 @@ export default {
     padding: 20px;
     height: 100vh;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 </style>

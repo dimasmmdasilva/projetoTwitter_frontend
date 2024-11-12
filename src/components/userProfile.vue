@@ -11,7 +11,7 @@
             <img
                 v-if="user?.profile_image_url"
                 :src="user.profile_image_url"
-                alt="imagem"
+                alt="imagem perfil"
                 class="profile-img"
             />
             <div v-else class="placeholder-img">
@@ -149,9 +149,9 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 100%; /* Ocupa 100% da coluna esquerda */
+    height: 100%;
     padding: 20px;
-    box-sizing: border-box; /* Para incluir padding sem adicionar rolagem */
+    box-sizing: border-box;
 }
 
 .profile-img-container {
@@ -166,7 +166,7 @@ export default {
     width: 100px;
     height: 100px;
     object-fit: cover;
-    background-color: #666;
+    background-color: #b7b7b7;
 }
 
 .hidden {
