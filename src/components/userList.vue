@@ -94,7 +94,7 @@ export default {
 .user-img {
     width: 50px;
     height: 50px;
-    border-radius: 50%;
+    border-radius: 70%;
     margin-bottom: 5px;
     object-fit: cover;
 }

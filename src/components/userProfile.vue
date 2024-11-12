@@ -178,7 +178,7 @@ export default {
     align-items: center;
     width: 100px;
     height: 100px;
-    border-radius: 50%;
+    border-radius: 80%;
     background-color: #ddd;
     color: #666;
     font-size: 14px;
