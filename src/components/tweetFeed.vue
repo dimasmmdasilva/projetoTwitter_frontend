@@ -85,6 +85,7 @@ export default {
     background-color: #f5f5f5;
     border-radius: 8px;
     min-height: 100%;
+    overflow-y: auto;
 }
 .create-tweet {
     display: flex;

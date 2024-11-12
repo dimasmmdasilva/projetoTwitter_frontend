@@ -81,7 +81,7 @@ export default {
 .container {
     display: flex;
     height: 100vh;
-    overflow-y: hidden !important;
+    overflow: hidden; /* Remover rolagem global */
 }
 
 .sidebar-left {
@@ -89,13 +89,13 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     box-sizing: border-box;
+    overflow: hidden; /* Impedir rolagem */
 }
 
 .main-content {
     width: 70%;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto;
     box-sizing: border-box;
 }
 
@@ -104,7 +104,7 @@ export default {
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto;
     box-sizing: border-box;
 }
+
 </style>

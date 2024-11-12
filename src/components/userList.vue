@@ -78,6 +78,7 @@ export default {
     padding: 20px;
     border-radius: 8px;
     min-height: 100%;
+    overflow-y: auto;
 }
 .user-container {
     display: flex;
