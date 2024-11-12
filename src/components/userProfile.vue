@@ -145,14 +145,13 @@ export default {
 
 <style scoped>
 .user-profile {
-    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 100vh; /* Garante que ocupe a altura total da coluna */
+    height: 100%; /* Ocupa 100% da coluna esquerda */
     padding: 20px;
-    box-sizing: border-box; /* Garante que padding não adicione overflow */
+    box-sizing: border-box; /* Para incluir padding sem adicionar rolagem */
 }
 
 .profile-img-container {
@@ -194,15 +193,14 @@ export default {
 }
 
 .logout-button {
-    margin-top: auto;
+    margin-top: auto; /* Empurra o botão para o final */
+    margin-bottom: 30px; /* Mantém a distância de 30px do limite inferior */
     cursor: pointer;
     background-color: #2b2b2b;
     color: white;
-    margin-bottom: 30px; /* Distância de 30px do limite inferior */
     padding: 5px 10px;
     font-size: 10px;
     width: 100px;
-    align-self: center;
 }
 
 .logout-button:hover {
