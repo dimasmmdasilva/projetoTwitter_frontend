@@ -150,7 +150,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 100%;
+    height: 95%;
     padding: 20px;
 }
 
