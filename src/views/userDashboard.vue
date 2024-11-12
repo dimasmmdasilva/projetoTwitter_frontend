@@ -84,27 +84,29 @@ export default {
 .container {
     display: flex;
     height: 100vh;
-    overflow: hidden!important;
+    overflow: hidden !important;
 }
 
 .sidebar-left {
     width: 20%;
     background-color: #f5f5f5;
     padding: 20px;
+    height: 100%;
+    overflow: hidden;
 }
 
 .main-content {
-    width: 70%;
+    width: 60%;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto; /* Rolagem interna apenas para tweets */
+    overflow-y: auto;
 }
 
 .sidebar-right {
-    width: 10%;
+    width: 20%;
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
-    overflow-y: auto; /* Rolagem interna apenas para lista de usuários */
+    overflow-y: auto;
 }
 </style>
