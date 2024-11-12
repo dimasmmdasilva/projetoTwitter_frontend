@@ -80,7 +80,7 @@ export default {
 <style scoped>
 .container {
     display: flex;
-    height: 97vh;
+    height: 96vh;
     overflow: hidden;
 }
 
