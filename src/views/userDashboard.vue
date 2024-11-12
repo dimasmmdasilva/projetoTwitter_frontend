@@ -84,7 +84,7 @@ export default {
 .container {
     display: flex;
     height: 100vh;
-    overflow: hidden; /* Remove a rolagem global */
+    overflow: hidden!important;
 }
 
 .sidebar-left {
@@ -94,14 +94,14 @@ export default {
 }
 
 .main-content {
-    width: 60%;
+    width: 70%;
     padding: 20px;
     height: 100vh;
     overflow-y: auto; /* Rolagem interna apenas para tweets */
 }
 
 .sidebar-right {
-    width: 20%;
+    width: 10%;
     background-color: #f5f5f5;
     padding: 20px;
     height: 100vh;
