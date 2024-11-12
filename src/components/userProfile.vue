@@ -1,5 +1,5 @@
 <template>
-    <div class="user-profile" @scroll="handleScroll">
+    <div class="user-profile">
         <notification-alert
             v-if="notificationMessage"
             :message="notificationMessage"
@@ -44,12 +44,6 @@
             </button>
         </div>
 
-        <!-- Botão "Subir ao Topo" aparece ao descer a página -->
-        <button v-if="showScrollTopButton" class="scroll-top-button" @click="scrollToTop">
-            Subir ao Topo
-        </button>
-
-        <!-- Botão "Sair" fixo na parte inferior -->
         <button class="logout-button" @click="handleLogout">Sair</button>
     </div>
 </template>
@@ -67,7 +61,6 @@ export default {
             newBio: '',
             isEditingBio: false,
             isSaving: false,
-            showScrollTopButton: false, // Controla a visibilidade do botão "Subir ao Topo"
         };
     },
     computed: {
@@ -136,13 +129,6 @@ export default {
         async handleLogout() {
             await this.logout();
             this.$router.push('/login');
-        },
-        handleScroll() {
-            // Exibe o botão "Subir ao Topo" se o usuário descer mais de 100 pixels
-            this.showScrollTopButton = window.scrollY > 100;
-        },
-        scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     },
     async created() {
@@ -164,10 +150,8 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 100vh;
+    height: 100%;
     padding: 20px;
-    position: relative; /* Para posicionamento dos botões */
-    overflow-y: auto; /* Permite rolagem interna */
 }
 
 .profile-img-container {
@@ -224,11 +208,11 @@ button {
 }
 
 .logout-button {
-    position: absolute;
-    bottom: 20px;
+    margin-top: auto;
     cursor: pointer;
     background-color: #2b2b2b;
     color: white;
+    margin-bottom: 30px;
     padding: 5px 10px;
     font-size: 10px;
     width: 100px;
@@ -236,16 +220,5 @@ button {
 
 .logout-button:hover {
     background-color: #cc0000;
-}
-
-.scroll-top-button {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    background-color: #2b2b2b;
-    color: white;
-    padding: 5px 10px;
-    font-size: 10px;
-    cursor: pointer;
 }
 </style>
