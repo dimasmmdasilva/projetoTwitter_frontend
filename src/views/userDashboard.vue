@@ -86,6 +86,7 @@ export default {
 
 .sidebar-left {
     width: 20%;
+    height: 100vh;
     background-color: #f5f5f5;
     padding: 20px;
     box-sizing: border-box;
