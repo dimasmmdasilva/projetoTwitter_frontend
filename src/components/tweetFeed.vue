@@ -7,10 +7,11 @@
             @close="clearNotification"
         />
 
+        <!-- Seção de criação de tweet fixa no topo -->
         <div class="create-tweet">
             <textarea
                 v-model="newTweetContent"
-                placeholder="escreva suas ideias..."
+                placeholder="Escreva suas ideias..."
                 rows="3"
             ></textarea>
             <button
@@ -21,9 +22,11 @@
             </button>
         </div>
 
-        <TweetItem v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
-
-        <p v-if="isLoading && tweets.length === 0">Carregando tweets...</p>
+        <!-- Lista de tweets com rolagem independente -->
+        <div class="tweet-list">
+            <TweetItem v-for="tweet in tweets" :key="tweet.id" :tweet="tweet" />
+            <p v-if="isLoading && tweets.length === 0">Carregando tweets...</p>
+        </div>
     </div>
 </template>
 
@@ -80,25 +83,34 @@ export default {
 </script>
 
 <style scoped>
+/* Configuração da altura total e rolagem interna */
 .tweet-feed {
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-}
-.create-tweet {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
+    height: 100%;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
 }
+
+.create-tweet {
+    padding: 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
 textarea {
-    width: 60%;
+    width: 100%;
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 10px;
     border: 1px solid #ddd;
     resize: none;
 }
+
 button {
     background-color: #1da1f2;
     color: white;
@@ -109,7 +121,14 @@ button {
     width: 100px;
     margin-top: 10px;
 }
+
 button:disabled {
     background-color: #aaa;
+}
+
+.tweet-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
 }
 </style>

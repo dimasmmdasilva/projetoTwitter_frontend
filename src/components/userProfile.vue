@@ -87,7 +87,7 @@ export default {
 
                 try {
                     await this.updateProfileImage(formData);
-                    await this.fetchUserProfile();  // Atualiza o perfil do usuário para exibir a nova imagem
+                    await this.fetchUserProfile();
                     this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
                 } catch (error) {
                     console.error("Erro ao atualizar a imagem de perfil:", error);
@@ -149,8 +149,6 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    height: 100%;
     padding: 20px;
 }
 
@@ -212,7 +210,6 @@ button {
     cursor: pointer;
     background-color: #2b2b2b;
     color: white;
-    margin-bottom: 30px;
     padding: 5px 10px;
     font-size: 10px;
     width: 100px;
