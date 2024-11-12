@@ -81,7 +81,7 @@ export default {
 .container {
     display: flex;
     height: 100vh;
-    overflow: hidden !important;
+    overflow-y: hidden !important;
 }
 
 .sidebar-left {
