@@ -150,7 +150,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 100vh;
+    height: 100%;
     padding: 20px;
 }
 
@@ -162,7 +162,7 @@ export default {
 }
 
 .profile-img {
-    border-radius: 10%;
+    border-radius: 50%;
     width: 100px;
     height: 100px;
     object-fit: cover;
@@ -208,7 +208,6 @@ button {
 }
 
 .logout-button {
-    position: absolute;
     margin-top: auto;
     cursor: pointer;
     background-color: #2b2b2b;
