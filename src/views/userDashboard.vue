@@ -80,13 +80,13 @@ export default {
 <style scoped>
 .container {
     display: flex;
-    height: 100vh;
+    height: 95vh;
     overflow: hidden;
 }
 
 .sidebar-left {
     width: 20%;
-    height: 95vh;
+    height: 100vh;
     background-color: #f5f5f5;
     padding: 20px;
     box-sizing: border-box;
@@ -96,7 +96,7 @@ export default {
 .main-content {
     width: 70%;
     padding: 20px;
-    height: 95vh;
+    height: 100vh;
     overflow-y: auto;
     box-sizing: border-box;
 }
@@ -105,7 +105,7 @@ export default {
     width: 10%;
     background-color: #f5f5f5;
     padding: 20px;
-    height: 95vh;
+    height: 100vh;
     overflow-y: auto;
     box-sizing: border-box;
 }
