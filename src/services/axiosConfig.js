@@ -4,7 +4,7 @@ import router from '../router/index';
 
 // Configuração inicial do Axios
 const api = axios.create({
-    baseURL: process.env.VUE_APP_API_URL || 'https://projetofinal-back-end.onrender.com/api',
+    baseURL: process.env.VUE_APP_API_URL || 'https://dimasmmdasilva.pythonanywhere.com/api',
     withCredentials: true,
     headers: {
         Accept: 'application/json',

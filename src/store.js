@@ -10,8 +10,8 @@ const store = createStore({
         tweets: [],
         users: [],
         isLoading: false,
-        notificationMessage: null, // Mensagem de notificação
-        notificationType: 'success', // Tipo de notificação ('success' ou 'error')
+        notificationMessage: null,
+        notificationType: 'success',
     },
     mutations: {
         setToken(state, token) {
