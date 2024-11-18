@@ -55,6 +55,7 @@ export default {
 .tweet-item {
     border-bottom: 1px solid #ddd;
     padding: 10px 0;
+    width: 50%;
 }
 
 .tweet-header {
