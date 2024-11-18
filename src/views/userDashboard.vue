@@ -97,7 +97,6 @@ export default {
 .main-content {
     width: 70%;
     height: 100vh;
-    padding: 10px;
     overflow-y: auto;
     box-sizing: border-box;
 }
