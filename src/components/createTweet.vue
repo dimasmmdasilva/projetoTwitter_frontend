@@ -91,6 +91,7 @@ export default {
 }
 textarea {
     width: 70%;
+    padding: 20px;
     border-radius: 8px;
     border: 1px solid #ddd;
     resize: none;
