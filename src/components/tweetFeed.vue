@@ -81,9 +81,8 @@ export default {
 
 <style scoped>
 .tweet-feed {
-    padding: 25px;
+    padding: 35px;
     background-color: #f5f5f5;
-    border-radius: 8px;
     min-height: 100%;
 }
 .create-tweet {
