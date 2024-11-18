@@ -96,7 +96,6 @@ textarea {
     width: 60%;
     padding: 20px;
     border-radius: 8px;
-    margin-bottom: 10px;
     border: 1px solid #ddd;
     resize: none;
 }
