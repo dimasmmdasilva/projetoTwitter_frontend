@@ -83,8 +83,7 @@ export default {
 .tweet-feed {
     padding: 35px;
     background-color: #f5f5f5;
-    min-height: 100%;
-    padding-top: -5px;
+    height: auto;
 }
 .create-tweet {
     display: flex;
