@@ -61,6 +61,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 70%;
 }
 
 .delete-btn {
