@@ -84,6 +84,7 @@ export default {
     padding: 35px;
     background-color: #f5f5f5;
     min-height: 100%;
+    padding-top: -5px;
 }
 .create-tweet {
     display: flex;
