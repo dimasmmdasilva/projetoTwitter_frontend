@@ -82,7 +82,7 @@ export default {
     display: flex;
     height: 96vh;
     overflow: hidden;
-    margin-top: 5px;
+    padding-top: 5px;
 }
 
 .sidebar-left {
