@@ -53,9 +53,12 @@ export default {
 
 <style scoped>
 .tweet-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     border-bottom: 1px solid #ddd;
     padding: 10px 0;
-    width: 50%;
+    width: 60%;
 }
 
 .tweet-header {
