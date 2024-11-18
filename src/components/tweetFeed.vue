@@ -81,6 +81,7 @@ export default {
 
 <style scoped>
 .tweet-feed {
+    padding: 15px;
     background-color: #f5f5f5;
     border-radius: 8px;
     min-height: 100%;
@@ -89,13 +90,13 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 textarea {
-    width: 50%;
+    width: 60%;
     padding: 20px;
     border-radius: 8px;
+    margin-bottom: 10px;
     border: 1px solid #ddd;
     resize: none;
 }
