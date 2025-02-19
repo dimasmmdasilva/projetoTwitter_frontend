@@ -1,51 +1,70 @@
 <template>
-    <div class="user-profile">
-        <notification-alert
+        <NotificationAlert
             v-if="notificationMessage"
             :message="notificationMessage"
             :type="notificationType"
             @close="clearNotification"
         />
-
-        <div class="profile-img-container" @click="triggerFileUpload">
-            <img
-                v-if="user?.profile_image_url"
-                :src="user.profile_image_url"
-                alt="imagem perfil"
-                class="profile-img"
-            />
-            <div v-else class="placeholder-img">
-                <span>imagem</span>
-            </div>
-            <input
-                type="file"
-                ref="fileInput"
-                class="hidden"
-                @change="uploadImage"
-                accept="image/*"
-            />
-        </div>
-
-        <h2 v-if="user?.username">{{ user.username }}</h2>
-        <h2 v-else>usuário não encontrado</h2>
-        <p>{{ user?.followers_count || 0 }} seguidores</p>
-
-        <div class="bio-container">
-            <p v-if="!isEditingBio" class="bio-text">{{ user?.bio || 'escreva sobre você' }}</p>
-            <div v-if="isEditingBio">
-                <textarea v-model="newBio" maxlength="300"></textarea>
-                <div class="buttons">
-                    <button @click="confirmEditBio" :disabled="isSaving">confirmar</button>
-                    <button @click="cancelEditBio">cancelar</button>
+        <v-card 
+        class="fill-height d-flex flex-column align-center" 
+        elevation="3" 
+        style="background-color: #BBDEFB;"
+        >
+            <v-avatar size="120" class="mb-4 mt-6" @click="triggerFileUpload" color="#90CAF9">
+                <img
+                    v-if="user?.profile_image_url"
+                    :src="user.profile_image_url"
+                    alt="Imagem de perfil"
+                />
+                <v-icon v-else size="60">mdi-account</v-icon>
+            </v-avatar>
+            <input type="file" ref="fileInput" class="d-none" @change="uploadImage" accept="image/*"/>
+            <v-card-title class="text-center text-h6 font-weight-bold">
+                {{ user?.username || 'Usuário não encontrado' }}
+            </v-card-title>
+            <v-card-subtitle class="text-center text-caption mb-3">
+                {{ user?.followers_count || 0 }} seguidores
+            </v-card-subtitle>
+            <v-card-text>
+                <p v-if="!isEditingBio" class="text-caption text-center font-italic">
+                    "{{ user?.bio || 'Escreva sobre você' }}"
+                </p>
+                <v-textarea
+                    v-if="isEditingBio"
+                    v-model="newBio"
+                    label="Biografia"
+                    variant="solo"
+                    counter="300"
+                    auto-grow="false"
+                    style="height: 200px; max-height: 200px; min-height: 100px; resize:none ; overflow-y: hidden;"
+                ></v-textarea>
+                <v-btn
+                    v-if="!isEditingBio"
+                    variant="outlined"
+                    color="primary"
+                    class="mt-2"
+                    @click="editBio"
+                    :disabled="isSaving"
+                    size="small"
+                    block
+                >
+                    Editar Biografia
+                </v-btn>
+                <div v-if="isEditingBio" class="d-flex justify-space-between mt-2">
+                    <v-btn color="#90CAF9" @click="confirmEditBio" :loading="isSaving" size="small">
+                        Confirmar
+                    </v-btn>
+                    <v-btn color="#EF9A9A" @click="cancelEditBio" size="small">
+                        Cancelar
+                    </v-btn>
                 </div>
-            </div>
-            <button v-if="!isEditingBio" @click="editBio" :disabled="isSaving">
-                biografia
-            </button>
-        </div>
-
-        <button class="logout-button" @click="handleLogout">sair</button>
-    </div>
+            </v-card-text>
+            <v-card-actions class="d-flex justify-center mt-auto">
+                <v-btn color="#FFEBEE" @click="handleLogout" size="small" style="background-color: #E53935;">
+                    Sair
+                </v-btn>
+            </v-card-actions>
+        </v-card>
 </template>
 
 <script>
@@ -71,7 +90,12 @@ export default {
         }),
     },
     methods: {
-        ...mapActions(['updateProfileImage', 'updateBio', 'fetchUserProfile', 'logout']),
+        ...mapActions([
+            'updateProfileImage',
+            'updateBio',
+            'fetchUserProfile',
+            'logout',
+        ]),
         ...mapMutations(['setNotification', 'clearNotification']),
 
         triggerFileUpload() {
@@ -87,16 +111,25 @@ export default {
 
                 try {
                     await this.updateProfileImage(formData);
-                    await this.fetchUserProfile();  // Atualiza o perfil do usuário para exibir a nova imagem
-                    this.setNotification({ message: 'Imagem de perfil atualizada com sucesso!', type: 'success' });
+                    await this.fetchUserProfile();
+                    this.setNotification({
+                        message: 'Imagem de perfil atualizada com sucesso!',
+                        type: 'success',
+                    });
                 } catch (error) {
-                    console.error("Erro ao atualizar a imagem de perfil:", error);
-                    this.setNotification({ message: 'Erro ao atualizar a imagem. Tente novamente.', type: 'error' });
+                    console.error('Erro ao atualizar a imagem de perfil:', error);
+                    this.setNotification({
+                        message: 'Erro ao atualizar a imagem. Tente novamente.',
+                        type: 'error',
+                    });
                 } finally {
                     this.isSaving = false;
                 }
             } else {
-                this.setNotification({ message: 'O arquivo deve ser menor que 2MB.', type: 'error' });
+                this.setNotification({
+                    message: 'O arquivo deve ser menor que 2MB.',
+                    type: 'error',
+                });
             }
         },
         editBio() {
@@ -105,7 +138,10 @@ export default {
         },
         async confirmEditBio() {
             if (this.newBio.length > 300) {
-                this.setNotification({ message: 'A biografia não pode ter mais de 300 caracteres.', type: 'error' });
+                this.setNotification({
+                    message: 'A biografia não pode ter mais de 300 caracteres.',
+                    type: 'error',
+                });
                 return;
             }
             this.isSaving = true;
@@ -113,11 +149,17 @@ export default {
 
             try {
                 await this.updateBio({ bio: this.newBio });
-                this.setNotification({ message: 'Biografia atualizada com sucesso!', type: 'success' });
+                this.setNotification({
+                    message: 'Biografia atualizada com sucesso!',
+                    type: 'success',
+                });
                 this.isEditingBio = false;
                 await this.fetchUserProfile();
             } catch (error) {
-                this.setNotification({ message: 'Erro ao atualizar biografia. Tente novamente.', type: 'error' });
+                this.setNotification({
+                    message: 'Erro ao atualizar biografia. Tente novamente.',
+                    type: 'error',
+                });
             } finally {
                 this.isSaving = false;
             }
@@ -129,97 +171,19 @@ export default {
         async handleLogout() {
             await this.logout();
             this.$router.push('/login');
-        }
+        },
     },
     async created() {
         if (!this.user) {
             try {
                 await this.fetchUserProfile();
             } catch (error) {
-                this.setNotification({ message: 'Erro ao carregar perfil do usuário. Tente novamente.', type: 'error' });
+                this.setNotification({
+                    message: 'Erro ao carregar perfil do usuário. Tente novamente.',
+                    type: 'error',
+                });
             }
         }
-    }
+    },
 };
 </script>
-
-<style scoped>
-.user-profile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.profile-img-container {
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.profile-img {
-    border-radius: 70%;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    background-color: #b7b7b7;
-}
-
-.hidden {
-    display: none;
-}
-
-.placeholder-img {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100px;
-    height: 100px;
-    border-radius: 70%;
-    background-color: #ddd;
-    color: #bababa;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-}
-
-textarea {
-    width: 100%;
-    height: 100px;
-    margin-top: 10px;
-    resize: none;
-}
-
-.buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-button {
-    margin-top: 10px;
-    padding: 5px 10px; 
-    cursor: pointer;
-    font-size: 10px;
-    width: 100px;
-}
-
-.logout-button {
-    margin-top: auto;
-    margin-bottom: 30px;
-    cursor: pointer;
-    background-color: #2b2b2b;
-    color: white;
-    padding: 5px 10px;
-    font-size: 10px;
-    width: 100px;
-}
-
-.logout-button:hover {
-    background-color: #cc0000;
-}
-</style>

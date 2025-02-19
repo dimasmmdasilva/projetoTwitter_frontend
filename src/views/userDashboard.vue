@@ -1,24 +1,29 @@
 <template>
-    <div class="container">
+    <v-container fluid class="fill-height pa-0 ma-0" style="height: 100vh; overflow: hidden;">
         <NotificationAlert
             v-if="notificationMessage"
             :message="notificationMessage"
             :type="notificationType"
             @close="clearNotification"
         />
-
-        <div class="sidebar-left" v-if="user">
-            <UserProfile :userProfile="user" />
-        </div>
-
-        <div class="main-content">
-            <TweetFeed />
-        </div>
-        
-        <div class="sidebar-right">
-            <UserList />
-        </div>
-    </div>
+        <v-row class="fill-height d-flex justify-center no-gutters">
+            <v-col cols="12" md="3" lg="3" class="pa-1">
+                <v-sheet class="fill-height" color="white">
+                    <UserProfile :userProfile="user" />
+                </v-sheet>
+            </v-col>
+            <v-col cols="12" md="7" lg="7" class="pa-1">
+                <v-sheet class="fill-height" color="white" elevation="3">
+                    <TweetFeed />
+                </v-sheet>
+            </v-col>
+            <v-col cols="12" md="2" lg="2" class="pa-1">
+                <v-sheet class="fill-height" color="white">
+                    <UserList />
+                </v-sheet>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
@@ -61,10 +66,16 @@ export default {
         async loadUserProfile() {
             try {
                 await this.fetchUserProfile();
-                this.setNotification({ message: 'Perfil do usuário carregado com sucesso.', type: 'success' });
+                this.setNotification({
+                    message: 'Perfil do usuário carregado com sucesso.',
+                    type: 'success',
+                });
             } catch (error) {
                 console.error('Erro ao carregar perfil:', error);
-                this.setNotification({ message: 'Erro ao carregar perfil. Faça login novamente.', type: 'error' });
+                this.setNotification({
+                    message: 'Erro ao carregar perfil. Faça login novamente.',
+                    type: 'error',
+                });
                 await this.handleLogout();
             }
         },
@@ -76,40 +87,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.container {
-    display: flex;
-    height: 96vh;
-    overflow: hidden;
-    padding-top: 5px;
-}
-
-.sidebar-left {
-    width: 20%;
-    height: 100vh;
-    background-color: #f5f5f5;
-    padding: 10px;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.main-content {
-    width: 70%;
-    height: 100vh;
-    padding-left: 10px;
-    padding-right: 10px;
-    overflow-y: auto;
-    box-sizing: border-box;
-}
-
-.sidebar-right {
-    width: 10%;
-    background-color: #f5f5f5;
-    padding: 10px;
-    height: 100vh;
-    overflow-y: auto;
-    box-sizing: border-box;
-}
-
-</style>

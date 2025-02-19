@@ -50,16 +50,18 @@ router.beforeEach(async (to, from, next) => {
                 await store.dispatch('refreshToken');
                 next(); // Permite a navegação após renovação do token
             } catch (error) {
-                console.warn('[Router] Falha na renovação do token, redirecionando para login.');
+                console.warn(
+                    '[Router] Falha na renovação do token, redirecionando para login.',
+                );
                 store.dispatch('logout'); // Limpa o estado de autenticação no Vuex
                 next('/login'); // Redireciona para a página de login se a renovação falhar
             }
         }
-    } 
+    }
     // Se a rota é para visitantes e o usuário está autenticado
     else if (to.meta.guest && isAuthenticated) {
         next('/dashboard'); // Redireciona usuários autenticados para o dashboard
-    } 
+    }
     // Caso contrário, permite o acesso à rota
     else {
         next();

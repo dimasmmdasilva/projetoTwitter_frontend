@@ -1,8 +1,17 @@
 <template>
-    <div v-if="message" :class="['notification', type]" @click="closeNotification">
-        {{ message }}
-    </div>
+    <v-snackbar
+        v-model="show"
+        :color="type === 'error' ? 'red' : 'blue'"
+        :timeout="5000"
+        location="bottom center"
+        class="text-center"
+    >
+        <div class="w-100 d-flex justify-center align-center">
+            {{ message }}
+        </div>
+    </v-snackbar>
 </template>
+
 
 <script>
 export default {
@@ -13,43 +22,32 @@ export default {
         },
         type: {
             type: String,
-            default: 'success',
+            default: "success",
+        },
+    },
+    data() {
+        return {
+            show: false,
+        };
+    },
+    watch: {
+        message: {
+            immediate: true,
+            handler(newMessage) {
+                if (newMessage) {
+                    this.show = true;
+                    setTimeout(() => {
+                        this.closeNotification();
+                    }, 5000);
+                }
+            },
         },
     },
     methods: {
         closeNotification() {
-            this.$emit('close');
-        },
-    },
-    watch: {
-        message() {
-            if (this.message) {
-                setTimeout(() => {
-                    this.closeNotification();
-                }, 5000);
-            }
+            this.show = false;
+            this.$emit("close");
         },
     },
 };
 </script>
-
-<style scoped>
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-.notification.success {
-    background-color: #65afff;
-}
-.notification.error {
-    background-color: #ff675c;
-}
-</style>

@@ -54,7 +54,10 @@ export default {
 
             if (!this.tweetContent.trim()) {
                 // Impede o envio se o conteúdo estiver vazio
-                this.setNotification({ message: 'O conteúdo do tweet não pode estar vazio.', type: 'error' });
+                this.setNotification({
+                    message: 'O conteúdo do tweet não pode estar vazio.',
+                    type: 'error',
+                });
                 return;
             }
 
@@ -75,9 +78,15 @@ export default {
 
                 // Limpa o campo após o envio bem-sucedido
                 this.tweetContent = '';
-                this.setNotification({ message: 'Tweet postado com sucesso!', type: 'success' });
+                this.setNotification({
+                    message: 'Tweet postado com sucesso!',
+                    type: 'success',
+                });
             } catch (error) {
-                this.setNotification({ message: 'Erro ao postar tweet. Tente novamente.', type: 'error' });
+                this.setNotification({
+                    message: 'Erro ao postar tweet. Tente novamente.',
+                    type: 'error',
+                });
                 console.error('Erro ao postar tweet:', error);
             }
         },

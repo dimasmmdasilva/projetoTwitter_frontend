@@ -1,46 +1,66 @@
 <template>
-    <div class="signup-container">
-        <h1>Cadastro</h1>
-        <form @submit.prevent="handleSignUp" class="signup-form">
-            <div class="form-group">
-                <input
-                    type="text"
+    <v-container class="fill-height d-flex justify-center align-center">
+        <v-card class="pa-6 pb-4" width="420" elevation="8" rounded="lg">
+            <v-card-title class="text-center text-h5 font-weight-bold">
+                Cadastro
+            </v-card-title>
+            <v-form @submit.prevent="handleSignUp" class="d-flex flex-column align-center">
+                <v-text-field
                     v-model="username"
-                    placeholder="nome do usuário"
+                    label="Nome do Usuário"
+                    variant="outlined"
+                    density="comfortable"
+                    class="mt-4"
+                    style="width: 90%"
                     required
-                />
-            </div>
-            <div class="form-group">
-                <input
-                    type="password"
+                ></v-text-field>
+                <v-text-field
                     v-model="password"
-                    placeholder="senha"
-                    required
-                />
-            </div>
-            <div class="form-group">
-                <input
+                    label="Senha"
                     type="password"
-                    v-model="confirmPassword"
-                    placeholder="confirmar senha"
+                    variant="outlined"
+                    density="comfortable"
+                    class="mt-0"
+                    style="width: 90%"
                     required
-                />
-            </div>
-            <button type="submit" :disabled="isLoading">
+                ></v-text-field>
+                <v-text-field
+                    v-model="confirmPassword"
+                    label="Confirmar Senha"
+                    type="password"
+                    variant="outlined"
+                    density="comfortable"
+                    class="mt-0"
+                    style="width: 90%"
+                    required
+                ></v-text-field>
+            </v-form>
+            <v-btn
+                color="primary"
+                type="submit"
+                :loading="isLoading"
+                size="small"
+                class="mt-2 mb-0"
+                style="width: 90%"
+            >
                 {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
-            </button>
-        </form>
-        <router-link to="/login">já possui uma conta? entre por aqui</router-link>
-
-        <!-- Componente de notificação para exibir mensagens de erro ou sucesso -->
-        <NotificationAlert
-            v-if="notificationMessage"
-            :message="notificationMessage"
-            :type="notificationType"
-            @close="clearNotification"
-        />
-    </div>
+            </v-btn>
+            <v-card-actions class="justify-center">
+                <p class="text-caption">
+                    Já possui uma conta?
+                    <router-link to="/login">Entre por aqui</router-link>
+                </p>
+            </v-card-actions>
+            <NotificationAlert
+                v-if="notificationMessage"
+                :message="notificationMessage"
+                :type="notificationType"
+                @close="clearNotification"
+            />
+        </v-card>
+    </v-container>
 </template>
+
 
 <script>
 import { mapActions, mapState, mapMutations } from 'vuex';

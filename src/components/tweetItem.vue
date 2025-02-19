@@ -1,14 +1,32 @@
 <template>
-    <div class="tweet-item">
-        <div class="tweet-header">
-            <h3>{{ tweet.author }}</h3> <!-- Exibe o nome do autor diretamente -->
-            <small>{{ formatDate(tweet.created_at) }}</small> <!-- Exibe a data formatada -->
-            <button v-if="isAuthor" @click="handleDeleteTweet" class="delete-btn" title="Deletar Tweet">
-                🗑️ 
-            </button>
-        </div>
-        <p>{{ tweet.content }}</p>
-    </div>
+    <v-card class="mb-3 pa-3" elevation="2" max-width="600">
+        <v-card-title class="d-flex justify-space-between align-center">
+            <div class="d-flex align-center">
+                <v-avatar color="primary" size="40">
+                    <v-icon v-if="!tweet.author_image">mdi-account</v-icon>
+                    <img v-else :src="tweet.author_image" alt="Avatar do autor">
+                </v-avatar>
+                <div class="ml-3">
+                    <h3 class="text-subtitle-1 font-weight-bold">{{ tweet.author }}</h3>
+                    <small class="text-caption text-grey-darken-1">{{ formatDate(tweet.created_at) }}</small>
+                </div>
+            </div>
+
+            <v-btn 
+                v-if="isAuthor"
+                icon
+                color="red"
+                @click="handleDeleteTweet"
+                size="small"
+            >
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </v-card-title>
+
+        <v-card-text class="text-body-1">
+            {{ tweet.content }}
+        </v-card-text>
+    </v-card>
 </template>
 
 <script>
@@ -25,14 +43,14 @@ export default {
     methods: {
         ...mapActions(['deleteTweet']),
         formatDate(date) {
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        };
-        return new Date(date).toLocaleDateString(undefined, options);
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            };
+            return new Date(date).toLocaleDateString(undefined, options);
         },
         async handleDeleteTweet() {
             if (confirm('seu tweet será excluído...')) {
@@ -49,7 +67,6 @@ export default {
     },
 };
 </script>
-
 
 <style scoped>
 .tweet-item {
