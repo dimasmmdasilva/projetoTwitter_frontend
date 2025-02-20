@@ -1,26 +1,33 @@
 <template>
-    <div class="create-tweet">
-        <!-- Componente de notificação para exibir mensagens de sucesso ou erro -->
-        <notification-alert
+    <v-card elevation="3" class="pa-4" style="background-color: #BBDEFB;">
+        <NotificationAlert
             v-if="notificationMessage"
             :message="notificationMessage"
             :type="notificationType"
             @close="clearNotification"
         />
 
-        <textarea
+        <v-textarea
             v-model="tweetContent"
-            placeholder="escreva suas ideias..."
-            maxlength="280"
+            label="Escreva suas ideias..."
+            variant="solo"
+            counter="280"
+            auto-grow
             rows="3"
-        ></textarea>
-        <button
+            class="mt-2"
+        ></v-textarea>
+
+        <v-btn
+            block
+            color="primary"
+            class="mt-2"
             @click="handleCreateTweet"
+            :loading="isPosting"
             :disabled="isLoading || !tweetContent.trim()"
         >
             {{ isPosting ? 'Enviando...' : isLoading ? 'Aguarde...' : 'Tweet' }}
-        </button>
-    </div>
+        </v-btn>
+    </v-card>
 </template>
 
 <script>
@@ -93,27 +100,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.create-tweet {
-    margin-bottom: 20px;
-}
-textarea {
-    width: 70%;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    resize: none;
-}
-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    border: none;
-    background-color: #1da1f2;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-}
-button:disabled {
-    background-color: #aaa;
-}
-</style>
